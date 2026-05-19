@@ -6,8 +6,6 @@ import javax.swing.event.*;
 public class joshuamain{
     //properties
 
-    //testing
-
 
 
     //methods

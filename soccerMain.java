@@ -3,7 +3,7 @@ import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.*;
 
-public class joshuamain{
+public class soccerMain{
     //properties
 
 

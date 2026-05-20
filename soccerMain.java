@@ -2,7 +2,6 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.*;
-//For code
 
 public class soccerMain{
     //properties
@@ -28,8 +27,10 @@ public class soccerMain{
 
     }
 
-    //main method
-
+    //Main method
+	public static void main(String[] args){
+		new soccerMain();
+	}
 
     
 }

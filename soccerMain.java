@@ -4,23 +4,31 @@ import java.awt.event.*;
 import javax.swing.event.*;
 
 public class soccerMain{
-    //properties
+    //Properties
     JPanel thePanel = new JPanel();
     JFrame theFrame = new JFrame("PENALTY!");
+    
+	JButton helpButton = new JButton("Help");
+	JButton playButton = new JButton("Play");
+	
+	JLabel serverLabel = new JLabel("Server");
+	JLabel clientLabel = new JLabel("Client");
+	JTextField serverField = new JTextField();
+	JTextField clientField = new JTextField();
+	JButton serverButton = new JButton("Connect");
+	JButton clientButton = new JButton("Connect");
+
+    //Methods
 
 
 
-    //methods
-
-
-
-    //constructor
+    //Constructor
     public soccerMain(){
-        //start window
+        //Start window
             theFrame.setLayout(null);
             theFrame.setPreferredSize(new Dimension(1280, 720)); 
 
-        //finish window
+        //Finish window
             theFrame.setDefaultCloseOperation(3);
             theFrame.pack();
             theFrame.setVisible(true);

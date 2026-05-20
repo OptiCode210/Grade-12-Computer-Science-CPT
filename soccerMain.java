@@ -2,6 +2,7 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.*;
+//For code
 
 public class soccerMain{
     //properties

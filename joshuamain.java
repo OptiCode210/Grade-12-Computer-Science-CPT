@@ -2,9 +2,8 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.*;
-//For Paint Compnent
 
-public class soccerPenalty{
+public class joshuamain{
     //properties
 
 

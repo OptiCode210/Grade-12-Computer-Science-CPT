@@ -2,16 +2,22 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.*;
 import javax.swing.event.*;
+import java.awt.image.BufferedImage;
+import javax.imageio.*;
+import java.io.IOException;
+import java.io.File;
 
 public class soccerMain implements ActionListener{
     //Properties
     JPanel thePanel = new JPanel();
     JFrame theFrame = new JFrame("PENALTY!");
     
+    //Main menu
 	JButton helpButton = new JButton("Help");
 	JButton playButton = new JButton("Play");
 	JComponent[] mainMenu;
 	
+	//Connect
 	JLabel serverLabel = new JLabel("Server");
 	JLabel clientLabel = new JLabel("Client");
 	JTextField serverField = new JTextField();
@@ -19,9 +25,12 @@ public class soccerMain implements ActionListener{
 	JButton serverButton = new JButton("Host");
 	JButton clientButton = new JButton("Join");
 	String strServerID;
+	String strServerIP;
 	JComponent[] connectMenu;
-	
 	SuperSocketMaster connectSSM = null;
+	
+	//Picking player
+	BufferedImage S1Front = null;
 	
     //Methods
     //For action listener
@@ -36,6 +45,7 @@ public class soccerMain implements ActionListener{
 		if(evt.getSource() == serverButton){
 			connectSSM = new SuperSocketMaster(6112, this); 
 			System.out.println(connectSSM.getMyAddress());
+			strServerIP = connectSSM.getMyAddress();
 			connectSSM.connect();
 		}
 		if(evt.getSource() == clientButton){
@@ -99,6 +109,13 @@ public class soccerMain implements ActionListener{
 		//Drawing main screen
 		setMainVisible(true);
 		setConnectVisible(false);
+					
+		//Players
+		try{
+			S1Front = ImageIO.read(new File("S1Front.gif"));	
+		}catch(IOException e){
+			System.out.println("Image unable to be loaded");
+		}
 								
         //Finish window
         theFrame.setContentPane(thePanel);
@@ -110,7 +127,7 @@ public class soccerMain implements ActionListener{
     }
 
     //Main method
-	public static void main(String[] args){
-		new soccerMain();
+	public static void main(String[] args){			
+		
 	}
 }

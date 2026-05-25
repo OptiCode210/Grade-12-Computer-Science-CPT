@@ -16,13 +16,13 @@ public class soccerMain implements ActionListener{
 	JLabel clientLabel = new JLabel("Client");
 	JTextField serverField = new JTextField();
 	JTextField clientField = new JTextField();
-	JButton serverButton = new JButton("Connect");
-	JButton clientButton = new JButton("Connect");
+	JButton serverButton = new JButton("Host");
+	JButton clientButton = new JButton("Join");
+	String strServerID;
 	JComponent[] connectMenu;
 	
 	SuperSocketMaster connectSSM = null;
-
-
+	
     //Methods
     //For action listener
 	public void actionPerformed(ActionEvent evt){
@@ -31,6 +31,23 @@ public class soccerMain implements ActionListener{
 			setMainVisible(false);
 			setConnectVisible(true);
 		}
+		
+		//Connecting to server
+		if(evt.getSource() == serverButton){
+			connectSSM = new SuperSocketMaster(6112, this); 
+			System.out.println(connectSSM.getMyAddress());
+			connectSSM.connect();
+		}
+		if(evt.getSource() == clientButton){
+			strServerID = JOptionPane.showInputDialog(theFrame, "Enter IP: ", "YIPPE", JOptionPane.PLAIN_MESSAGE);
+			connectSSM = new SuperSocketMaster(strServerID, 6112, this);
+		
+			//Access the connect method
+			connectSSM.connect();
+			serverButton.setEnabled(false);
+			clientButton.setEnabled(false);
+			System.out.println("CONNECTED");
+		}	
 	}
 	
 	//Setting menus to visible or invisible

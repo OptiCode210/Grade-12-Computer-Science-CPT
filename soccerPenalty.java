@@ -15,8 +15,6 @@ public class soccerPenalty extends JPanel{
         g.drawOval(intBallX, intBallY, 10, 10);
     }
 
-
-
     //constructor
     public soccerPenalty(){
         super();

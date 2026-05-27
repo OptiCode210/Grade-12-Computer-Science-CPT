@@ -1,16 +1,39 @@
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.*;
+import java.io.File;
 
 public class shootingMechanic extends JPanel implements ActionListener, KeyListener{
     // Properties
 
-    int fps = 60;
+        int fps = 60;  
 
-    JFrame theFrame = new JFrame("trial");
-    Timer theTimer = new Timer(1000/fps, this);
+        //temp Jcomponents
+        JFrame theFrame = new JFrame("trial");
+        Timer theTimer = new Timer(1000/fps, this);
+
+        //variables
+        String strikerName = "Striker Name";
+        int strikerAccuracy = 9;
+        int strikerPower = 2;
+
+        String keeperName = "Keeper Name";
+        int keeperAgility = 9;
+        int keeperCoverage = 2;
+
+        //images
+        BufferedImage imgBG = null;
+        BufferedImage imgGoal = null;
+        BufferedImage imgBall = null;
 
     //methods
+    public void loadCSV(){
+
+    }
+
     public void actionPerformed(ActionEvent evt){
 
     }
@@ -27,20 +50,46 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
 
     }
 
+    public void paintComponent(Graphics g){
+        //draw BG and goal
+            g.drawImage(imgBG, 0, 0, theFrame);
+            g.drawImage(imgGoal, 130, 160, theFrame);
+    }
+
+    public void loadIMG(){
+        try{
+            imgBG = ImageIO.read(new File("Images/shootingBG.jpeg"));imgGoal = ImageIO.read(new File("Images/Goal.png"));
+            imgBall = ImageIO.read(new File("Images/ball.png"));
+        }catch(IOException e){
+            System.out.println("image error");
+        }
+    }
+
+
     // Constructor
     public shootingMechanic(){
-        this.setLayout(null);
-        this.setPreferredSize(new Dimension(1280, 720));
-        this.setFocusable(true);
-        this.addKeyListener(this);
+        //start window (temp)
+            this.setLayout(null);
+            this.setPreferredSize(new Dimension(1280, 720));
+            this.setFocusable(true);
+            this.addKeyListener(this);
 
-        theFrame.setContentPane(this);
-        theFrame.setDefaultCloseOperation(3);
-        theFrame.pack();
-        theFrame.setVisible(true);
+        //start timer
+            theTimer.start();
 
-        theTimer.start();
-        this.requestFocusInWindow();
+        //repaint
+            repaint();
+
+        //load images
+            loadIMG();
+
+
+        //end window (temp)
+            theFrame.setContentPane(this);
+            theFrame.setDefaultCloseOperation(3);
+            theFrame.pack();
+            theFrame.setVisible(true);
+
     }
 
     // Main program

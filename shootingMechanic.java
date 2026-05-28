@@ -17,7 +17,7 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
 
         //variables
         String strikerName = "Striker Name";
-    int strikerAccuracy = 9;
+        int strikerAccuracy = 9;
         int strikerPower = 2;
 
         String keeperName = "Keeper Name";
@@ -84,9 +84,6 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
 
         //start timer
             theTimer.start();
-			intBallX = 20;
-			intBallY = 20;
-			imgBall.setBounds(0,300,300,100);
 
         //repaint
             repaint();

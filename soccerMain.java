@@ -29,6 +29,8 @@ public class soccerMain extends JPanel implements ActionListener {
 	String strServerIP;
 	JComponent[] connectMenu;
 	boolean blnConnected = false;
+	boolean blnSentPicks= false;
+	boolean blnReceivedPicks  = false;
 	String strIP;
 	String strNetText;
 	SuperSocketMaster connectSSM = null;
@@ -100,8 +102,12 @@ public class soccerMain extends JPanel implements ActionListener {
 	JButton S2Button = new JButton("Cristiano RONALDO");
 	JButton S3Button = new JButton("Lionel MESSI");
 	JButton confPickButton = new JButton("Confirm");
-	JLabel pickedKLabel = new JLabel("Keeper: ");
-	JLabel pickedSLabel = new JLabel("Striker: ");
+	
+	JLabel pickedKP1Label = new JLabel("Keeper: ");
+	JLabel pickedSP1Label = new JLabel("Striker: ");
+	JLabel pickedKP2Label = new JLabel("Keeper: ");
+	JLabel pickedSP2Label = new JLabel("Striker: ");
+	
 	JLabel pickLabel = new JLabel("");
 	JLabel playerLabel = new JLabel("");
 	JLabel KAgiLabel = new JLabel("");
@@ -121,84 +127,18 @@ public class soccerMain extends JPanel implements ActionListener {
 		
 		//Connecting to server
 		if(evt.getSource() == serverButton){
-			connectSSM = new SuperSocketMaster(6767, this); 
+			connectSSM = new SuperSocketMaster(6112, this); 
 			strIP = connectSSM.getMyAddress();
 			System.out.println(strIP);
 			IPLabel.setText("IP: "+strIP);
 			strServerIP = connectSSM.getMyAddress();
 			connectSSM.connect();
 			System.out.println("Waiting for connection");
-			
-			//Getting data from client side
-			while (blnConnected == false){
-				strNetText = connectSSM.readText();
-				if(strNetText.equals("Test")){
-					System.out.println("Read message");
-				}
-			}
-						
-			//Getting player stats for player 1
-			if(intPicking == 1){
-				pickLabel.setText("Currently picking: Player " + intPicking);
-				if(evt.getSource() == K1Button){
-					strP1K = strKeepers[0][0];
-					intP1KAgi = Integer.parseInt(strKeepers[0][1]);
-					intP1KCvg = Integer.parseInt(strKeepers[0][2]);
-					blnP1K = true;
-					pickedKLabel.setText("Keeper: "+strP1K);
-				}else if(evt.getSource() == K2Button){
-					strP1K = strKeepers[1][0];
-					intP1KAgi = Integer.parseInt(strKeepers[1][1]);
-					intP1KCvg = Integer.parseInt(strKeepers[1][2]);
-					blnP1K = true;
-					pickedKLabel.setText("Keeper: "+strP1K);
-				}else if(evt.getSource() == K3Button){
-					strP1K = strKeepers[2][0];
-					intP1KAgi = Integer.parseInt(strKeepers[2][1]);
-					intP1KCvg = Integer.parseInt(strKeepers[2][2]);
-					blnP1K = true;
-					pickedKLabel.setText("Keeper: "+strP1K);
-				}
-				
-				if(evt.getSource() == S1Button){
-					strP1S = strStrikers[0][0];
-					intP1SAcc = Integer.parseInt(strStrikers[0][1]);
-					intP1SPwr = Integer.parseInt(strStrikers[0][2]);
-					blnP1S = true;
-					pickedSLabel.setText("Striker: "+strP1S);
-				}else if(evt.getSource() == S2Button){
-					strP1S = strStrikers[1][0];
-					intP1SAcc = Integer.parseInt(strStrikers[1][1]);
-					intP1SPwr = Integer.parseInt(strStrikers[1][2]);
-					blnP1S = true;
-					pickedSLabel.setText("Striker: "+strP1S);
-				}else if(evt.getSource() == S3Button){
-					strP1S = strStrikers[2][0];
-					intP1SAcc = Integer.parseInt(strStrikers[2][1]);
-					intP1SPwr = Integer.parseInt(strStrikers[2][2]);
-					blnP1S = true;
-					pickedSLabel.setText("Striker: "+strP1S);
-				}
-				
-				if(blnP1K == true && blnP1S == true){
-					if(evt.getSource() == confPickButton){
-						System.out.println("--------------------------------------------------");
-						System.out.println("Player 1 picked:");
-						System.out.println("Keeper: " + strP1K + " Agility: " + intP1KAgi + " Coverage: " + intP1KCvg);
-						System.out.println("Striker: " + strP1S + " Accuracy: " + intP1SAcc + " Power: " + intP1SPwr);
-						
-						intPicking = 2;
-						pickLabel.setText("Currently picking: Player " + intPicking);
-						pickedKLabel.setText("Keeper: ");
-						pickedSLabel.setText("Striker: ");
-					}
-				}
-			}
 		}
 		
 		if(evt.getSource() == clientButton){
 			strServerID = JOptionPane.showInputDialog(theFrame, "Enter IP: ", "Connect", JOptionPane.PLAIN_MESSAGE);
-			connectSSM = new SuperSocketMaster(strServerID, 6767, this);
+			connectSSM = new SuperSocketMaster(strServerID, 6112, this);
 			strServerIP = connectSSM.getMyAddress();
 		
 			//Access the connect method
@@ -207,8 +147,66 @@ public class soccerMain extends JPanel implements ActionListener {
 			System.out.println("CONNECTED");
 			
 			//Sending data to server
-			connectSSM.sendText("Test");
+			connectSSM.sendText("Joined");
+			
+			//Loading selection screen for client 
+			setMainVisible(false);
+			setConnectVisible(false);
+			setSelectionVisible(true);
+			thePanel.repaint();
 		}	
+		
+		//Recieving network data
+		if(evt.getSource() == connectSSM){
+			strNetText = connectSSM.readText();
+			System.out.println("Recieved: "+strNetText);
+			
+			String strSplit[] = strNetText.split(",");
+			
+			if(strSplit[0].equals("Joined")){
+				blnConnected = true;
+				connectSSM.sendText("Start");
+				System.out.println("Client joined");
+				
+				//Loading selection screen for client 
+				setMainVisible(false);
+				setConnectVisible(false);
+				setSelectionVisible(true);
+				thePanel.repaint();
+			}else if(strSplit[0].equals("Start")){
+				blnConnected = true;
+				System.out.println("Server started game");
+			}else if(strSplit[0].equals("LIVE")) {
+				String strType = strSplit[1];   
+				String strName = strSplit[2];  
+				
+				if(strType.equals("K")) {
+					if(intPicking == 1) strP2K = strName; 
+					else strP1K = strName;
+					pickedKP2Label.setText("Opponent Keeper: " + strName);
+				} else if(strType.equals("S")) {
+					if(intPicking == 1) strP2S = strName;
+					else strP1S = strName;
+					pickedSP2Label.setText("Opponent Striker: " + strName);
+				}
+			}else if(strSplit[0].equals("Picks")){
+				strP2K = strSplit[1];
+				intP2KAgi = Integer.parseInt(strSplit[2]);
+				intP2KCvg = Integer.parseInt(strSplit[3]);
+				
+				strP2S = strSplit[4];
+				intP2SAcc = Integer.parseInt(strSplit[5]);
+				intP2SPwr = Integer.parseInt(strSplit[6]);
+				
+				blnP2K = true;
+				blnP2S = true;
+				blnReceivedPicks = true;
+				
+				System.out.println("Opponent picked");
+				System.out.println("Keeper: "+strP2K+"| Agility: "+intP2KAgi+"| Coverage"+intP2KCvg);
+				System.out.println("Striker: "+strP2S+"| Accuracy: "+intP2SAcc+"| Power: "+intP2SPwr);
+			}
+		}
 		
 		//Going to player selection
 		if(blnConnected == true){
@@ -217,27 +215,79 @@ public class soccerMain extends JPanel implements ActionListener {
 			setSelectionVisible(true);
 			thePanel.repaint();
 		}
+		
+		//Getting player stats for player 1(host)
+		if(intPicking == 1){
+			if(evt.getSource() == K1Button){
+				strP1K = strKeepers[0][0];
+				intP1KAgi = Integer.parseInt(strKeepers[0][1]);
+				intP1KCvg = Integer.parseInt(strKeepers[0][2]);
+				blnP1K = true;
+				pickedKP1Label.setText("Keeper: "+strP1K);
+				connectSSM.sendText("LIVE,K," + strP1K);
+			}else if(evt.getSource() == K2Button){
+				strP1K = strKeepers[1][0];
+				intP1KAgi = Integer.parseInt(strKeepers[1][1]);
+				intP1KCvg = Integer.parseInt(strKeepers[1][2]);
+				blnP1K = true;
+				pickedKP1Label.setText("Keeper: "+strP1K);
+				connectSSM.sendText("LIVE,K," + strP1K);
+			}else if(evt.getSource() == K3Button){
+				strP1K = strKeepers[2][0];
+				intP1KAgi = Integer.parseInt(strKeepers[2][1]);
+				intP1KCvg = Integer.parseInt(strKeepers[2][2]);
+				blnP1K = true;
+				pickedKP1Label.setText("Keeper: "+strP1K);
+				connectSSM.sendText("LIVE,K," + strP1K);
+			}
+			
+			if(evt.getSource() == S1Button){
+				strP1S = strStrikers[0][0];
+				intP1SAcc = Integer.parseInt(strStrikers[0][1]);
+				intP1SPwr = Integer.parseInt(strStrikers[0][2]);
+				blnP1S = true;
+				pickedSP1Label.setText("Striker: "+strP1S);
+				connectSSM.sendText("LIVE,S," + strP1S);
+			}else if(evt.getSource() == S2Button){
+				strP1S = strStrikers[1][0];
+				intP1SAcc = Integer.parseInt(strStrikers[1][1]);
+				intP1SPwr = Integer.parseInt(strStrikers[1][2]);
+				blnP1S = true;
+				pickedSP1Label.setText("Striker: "+strP1S);
+				connectSSM.sendText("LIVE,S," + strP1S);
+			}else if(evt.getSource() == S3Button){
+				strP1S = strStrikers[2][0];
+				intP1SAcc = Integer.parseInt(strStrikers[2][1]);
+				intP1SPwr = Integer.parseInt(strStrikers[2][2]);
+				blnP1S = true;
+				pickedSP1Label.setText("Striker: "+strP1S);
+				connectSSM.sendText("LIVE,S," + strP1S);
+			}
+		}				
 				
-		//Getting player stats for player 2
+		//Getting player stats for player 2(client)
 		else if(intPicking == 2){
 			if(evt.getSource() == K1Button){
 				strP2K = strKeepers[0][0];
 				intP2KAgi = Integer.parseInt(strKeepers[0][1]);
 				intP2KCvg = Integer.parseInt(strKeepers[0][2]);
 				blnP2K = true;
-				pickedKLabel.setText("Keeper: "+strP2K);
+				pickedKP2Label.setText("Keeper: "+strP2K);
+				connectSSM.sendText("LIVE,K," + strP2K);
 			}else if(evt.getSource() == K2Button){
 				strP2K = strKeepers[1][0];
 				intP2KAgi = Integer.parseInt(strKeepers[1][1]);
 				intP2KCvg = Integer.parseInt(strKeepers[1][2]);
 				blnP2K = true;
-				pickedKLabel.setText("Keeper: "+strP2K);
+				pickedKP2Label.setText("Keeper: "+strP2K);
+				connectSSM.sendText("LIVE,K," + strP2K);
 			}else if(evt.getSource() == K3Button){
 				strP2K = strKeepers[2][0];
 				intP2KAgi = Integer.parseInt(strKeepers[2][1]);
 				intP2KCvg = Integer.parseInt(strKeepers[2][2]);
 				blnP2K = true;
-				pickedKLabel.setText("Keeper: "+strP2K);
+				pickedKP2Label.setText("Keeper: "+strP2K);
+				connectSSM.sendText("LIVE,K," + strP2K);
 			}
 			
 			if(evt.getSource() == S1Button){
@@ -245,31 +295,58 @@ public class soccerMain extends JPanel implements ActionListener {
 				intP2SAcc = Integer.parseInt(strStrikers[0][1]);
 				intP2SPwr = Integer.parseInt(strStrikers[0][2]);
 				blnP2S = true;
-				pickedSLabel.setText("Striker: "+strP2S);
+				pickedSP2Label.setText("Striker: "+strP2S);
+				connectSSM.sendText("LIVE,S," + strP2S);
 			}else if(evt.getSource() == S2Button){
 				strP2S = strStrikers[1][0];
 				intP2SAcc = Integer.parseInt(strStrikers[1][1]);
 				intP2SPwr = Integer.parseInt(strStrikers[1][2]);
 				blnP2S = true;
-				pickedSLabel.setText("Striker: "+strP2S);
+				pickedSP2Label.setText("Striker: "+strP2S);
+				connectSSM.sendText("LIVE,S," + strP2S);
 			}else if(evt.getSource() == S3Button){
 				strP2S = strStrikers[2][0];
 				intP2SAcc = Integer.parseInt(strStrikers[2][1]);
 				intP2SPwr = Integer.parseInt(strStrikers[2][2]);
 				blnP2S = true;
-				pickedSLabel.setText("Striker: "+strP2S);
+				pickedSP2Label.setText("Striker: "+strP2S);
+				connectSSM.sendText("LIVE,S," + strP2S);
 			}
+		}
+		
+		//Finalizing and locking in picks
+		if(evt.getSource() == confPickButton){
+			boolean blnReady = (intPicking == 1 && blnP1K && blnP1S) || (intPicking == 2 && blnP2K && blnP2S);
 			
-			if(blnP2K == true && blnP2S == true){
-				if(evt.getSource() == confPickButton){
-					System.out.println("--------------------------------------------------");
-					System.out.println("Player 2 picked:");
-					System.out.println("Keeper: " + strP2K + " Agility: " + intP2KAgi + " Coverage: " + intP2KCvg);
-					System.out.println("Striker: " + strP2S + " Accuracy: " + intP2SAcc + " Power: " + intP2SPwr);
-					
-					intPicking = 3;
+			if(blnReady){
+				String strMessage;
+				if(intPicking == 1){
+					strMessage = ("PICKS,"+strP1K+","+intP1KAgi+","+intP1KCvg+","+strP1S+","+intP1SAcc+","+intP1SPwr);
+				}else if(intPicking == 2){
+					strMessage = ("PICKS,"+strP2K+","+intP2KAgi+","+intP2KCvg+","+strP2S+","+intP2SAcc+","+intP2SPwr);
+				}else{
+					strMessage = ("invalid");
 				}
+				
+				if(blnReceivedPicks == true){
+					pickLabel.setText("Both locked in! Starting game...");
+				}else{
+					pickLabel.setText("Waiting for other player...");
+				}
+				
+				System.out.println("Sent: "+strMessage);
+				
+				connectSSM.sendText(strMessage);
+				blnSentPicks = true;
+				pickLabel.setText("Waiting for opponent to lock in...");
+				System.out.println("Sent Final Confirmation: "+strMessage);
 			}
+		}
+		
+		//When both sides have locked in
+		if(blnSentPicks == true && blnReceivedPicks == true){
+			System.out.println("----------------------------------------");
+			System.out.println("Both ready! Proceed to comparison gameplay logic.");
 		}
 	}
 		
@@ -493,17 +570,27 @@ public class soccerMain extends JPanel implements ActionListener {
 		pickLabel.setFont(new Font("Arial", Font.BOLD, 28));
 		thePanel.add(pickLabel);
 		
-		pickedKLabel.setBounds(20, 610, 500, 30);
-		pickedKLabel.setForeground(Color.WHITE);
-		pickedKLabel.setFont(new Font("Arial", Font.BOLD, 20));
-		thePanel.add(pickedKLabel);
+		pickedKP1Label.setBounds(20, 610, 500, 30);
+		pickedKP1Label.setForeground(Color.WHITE);
+		pickedKP1Label.setFont(new Font("Arial", Font.BOLD, 20));
+		thePanel.add(pickedKP1Label);
 		
-		pickedSLabel.setBounds(20, 645, 500, 30);
-		pickedSLabel.setForeground(Color.WHITE);
-		pickedSLabel.setFont(new Font("Arial", Font.BOLD, 20));
-		thePanel.add(pickedSLabel);
+		pickedSP1Label.setBounds(20, 645, 500, 30);
+		pickedSP1Label.setForeground(Color.WHITE);
+		pickedSP1Label.setFont(new Font("Arial", Font.BOLD, 20));
+		thePanel.add(pickedSP1Label);
 		
-		confPickButton.setBounds(1050, 625, 180, 40);
+		pickedKP2Label.setBounds(500, 600, 450, 30);
+		pickedKP2Label.setForeground(Color.WHITE);
+		pickedKP2Label.setFont(new Font("Arial", Font.BOLD, 20));
+		thePanel.add(pickedKP2Label);
+		
+		pickedSP2Label.setBounds(500, 635, 450, 30);
+		pickedSP2Label.setForeground(Color.WHITE);
+		pickedSP2Label.setFont(new Font("Arial", Font.BOLD, 20));
+		thePanel.add(pickedSP2Label);
+		
+		confPickButton.setBounds(1050, 615, 180, 40);
 		confPickButton.addActionListener(this);
 		thePanel.add(confPickButton);
 		
@@ -511,7 +598,7 @@ public class soccerMain extends JPanel implements ActionListener {
 		selectionMenu = new JComponent[]{
 			K1Button, K2Button, K3Button, S1Button, S2Button, S3Button,
 			playerLabel, KAgiLabel, KCvgLabel, SPwrLabel, SAccLabel, pickLabel,
-			confPickButton, pickedKLabel, pickedSLabel
+			confPickButton, pickedKP1Label, pickedSP1Label, pickedKP2Label, pickedSP2Label
 		};
 		
 		//Drawing main screen

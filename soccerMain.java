@@ -136,24 +136,30 @@ public class soccerMain extends JPanel implements ActionListener {
 			System.out.println("Waiting for connection");
 		}
 		
-		if(evt.getSource() == clientButton){
-			strServerID = JOptionPane.showInputDialog(theFrame, "Enter IP: ", "Connect", JOptionPane.PLAIN_MESSAGE);
-			connectSSM = new SuperSocketMaster(strServerID, 6112, this);
-			strServerIP = connectSSM.getMyAddress();
-		
-			//Access the connect method
-			connectSSM.connect();
-			blnConnected = true;
-			System.out.println("CONNECTED");
-			
-			//Sending data to server
-			connectSSM.sendText("Joined");
-			
-			//Loading selection screen for client 
-			setMainVisible(false);
-			setConnectVisible(false);
-			setSelectionVisible(true);
-			thePanel.repaint();
+		if(evt.getSource() == clientButton){	
+			//Making sure IP adress is correct		
+			while(blnConnected == false){
+				strServerID = JOptionPane.showInputDialog(theFrame, "Enter IP: ", "Connect", JOptionPane.PLAIN_MESSAGE);
+				connectSSM = new SuperSocketMaster(strServerID, 6112, this);
+				strServerIP = connectSSM.getMyAddress();
+				System.out.println("Entered IP: "+strServerID);
+				
+				if(strIP.equals(strServerIP)){					
+					//Access the connect method
+					connectSSM.connect();
+					blnConnected = true;
+					System.out.println("CONNECTED");
+					
+					//Sending data to server
+					connectSSM.sendText("Joined");
+					
+					//Loading selection screen for client 
+					setMainVisible(false);
+					setConnectVisible(false);
+					setSelectionVisible(true);
+					thePanel.repaint();
+				}
+			}
 		}	
 		
 		//Recieving network data

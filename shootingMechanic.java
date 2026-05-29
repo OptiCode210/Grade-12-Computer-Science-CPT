@@ -4,7 +4,9 @@ import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import javax.imageio.*;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 
 public class shootingMechanic extends JPanel implements ActionListener, KeyListener{
     // Properties
@@ -15,29 +17,19 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
         JFrame theFrame = new JFrame("trial");
         Timer theTimer = new Timer(1000/intfps, this);
 
-        //variables
-        String strikerName = "Striker Name";
-        int strikerAccuracy = 9;
-        int strikerPower = 2;
-
-        String keeperName = "Keeper Name";
-        int keeperAgility = 9;
-        int keeperCoverage = 2;
         
         //Ball variables
-        int intBallX = 610;
-        int intBallY = 550;
+        int intBallX = 590;
+        int intBallY = 570;
 
         //images
         BufferedImage imgBG = null;
         BufferedImage imgGoal = null;
         BufferedImage imgBall = null;
 
+
+
     //methods
-    public void loadCSV(){
-
-    }
-
     public void actionPerformed(ActionEvent evt){
 
     }
@@ -59,7 +51,7 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
         //draw BG and goal
             //if(imgBall != null){
             g.drawImage(imgBG, 0, 0, theFrame);
-            g.drawImage(imgGoal, 130, 160, theFrame);
+            g.drawImage(imgGoal, 135, 120, theFrame);
             g.drawImage(imgBall,intBallX,intBallY,theFrame);
     }
 
@@ -72,6 +64,8 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
             System.out.println("image error");
         }
     }
+
+
 
 
     // Constructor
@@ -90,7 +84,6 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
 
         //load images
             loadIMG();
-
 
         //end window (temp)
             theFrame.setContentPane(this);

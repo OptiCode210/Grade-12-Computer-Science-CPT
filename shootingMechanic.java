@@ -9,11 +9,11 @@ import java.io.File;
 public class shootingMechanic extends JPanel implements ActionListener, KeyListener{
     // Properties
 
-        int fps = 60;  
+        int intfps = 60;  
 
         //temp Jcomponents
         JFrame theFrame = new JFrame("trial");
-        Timer theTimer = new Timer(1000/fps, this);
+        Timer theTimer = new Timer(1000/intfps, this);
 
         //variables
         String strikerName = "Striker Name";
@@ -23,6 +23,10 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
         String keeperName = "Keeper Name";
         int keeperAgility = 9;
         int keeperCoverage = 2;
+        
+        //Ball variables
+        int intBallX = 610;
+        int intBallY = 550;
 
         //images
         BufferedImage imgBG = null;
@@ -51,14 +55,18 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     }
 
     public void paintComponent(Graphics g){
+		super.paintComponent(g);
         //draw BG and goal
+            //if(imgBall != null){
             g.drawImage(imgBG, 0, 0, theFrame);
             g.drawImage(imgGoal, 130, 160, theFrame);
+            g.drawImage(imgBall,intBallX,intBallY,theFrame);
     }
 
     public void loadIMG(){
         try{
-            imgBG = ImageIO.read(new File("Images/shootingBG.jpeg"));imgGoal = ImageIO.read(new File("Images/Goal.png"));
+            imgBG = ImageIO.read(new File("Images/shootingBG.jpeg"));
+            imgGoal = ImageIO.read(new File("Images/Goal.png"));
             imgBall = ImageIO.read(new File("Images/ball.png"));
         }catch(IOException e){
             System.out.println("image error");

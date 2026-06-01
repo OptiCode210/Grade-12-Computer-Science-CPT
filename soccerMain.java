@@ -5,12 +5,26 @@ import javax.swing.event.*;
 import java.awt.image.BufferedImage;
 import javax.imageio.*;
 import java.io.IOException;
+import java.io.BufferedReader;
 import java.io.File;
-import arc.*;
+import java.io.FileReader;
 
 public class soccerMain extends JPanel implements ActionListener {
     //Properties
     JFrame theFrame = new JFrame("PENALTY!");
+    
+    //lists
+	String[][] strikers = new String[3][3];
+	String[][] keepers = new String[3][3];
+
+	//variables
+	String strikerName;
+	int strikerAccuracy;
+	int strikerPower;
+
+	String keeperName;
+	int keeperAgility;
+	int keeperCoverage;
     
     //Main menu
 	JButton helpButton = new JButton("Help");
@@ -91,9 +105,6 @@ public class soccerMain extends JPanel implements ActionListener {
 	boolean blnP1K = false;
 	boolean blnP2S = false;
 	boolean blnP2K = false;
-
-	String[][] strStrikers;
-	String[][] strKeepers;
 	
 	JButton K1Button = new JButton("Gianluigi DONNARUMA");
 	JButton K2Button = new JButton("James TRAFFORD");
@@ -117,6 +128,94 @@ public class soccerMain extends JPanel implements ActionListener {
 	JComponent[] selectionMenu;
 
     //Methods
+    	public void loadCSV(){
+        try{
+            //player file csv
+            BufferedReader playersFile = new BufferedReader(new FileReader("players.csv"));
+            String strLine;
+            int count = 0;
+
+            while((strLine = playersFile.readLine()) != null && count < strikers.length){
+                String[] split = strLine.split(",");    //splis data with ","
+
+                strikers[count][0] = split[0].trim();
+                strikers[count][1] = split[1].trim();
+                strikers[count][2] = split[2].trim();
+
+                count++;
+            }
+
+            playersFile.close();
+
+            //keeper file csv
+            BufferedReader keepersFile = new BufferedReader(new FileReader("keepers.csv"));
+            count = 0;
+
+            while((strLine = keepersFile.readLine()) != null && count < keepers.length){
+                String[] split = strLine.split(",");
+
+                keepers[count][0] = split[0].trim();
+                keepers[count][1] = split[1].trim();
+                keepers[count][2] = split[2].trim();
+
+                count++;
+            }
+
+            keepersFile.close();
+
+        }catch(IOException e){
+            System.out.println("File error");
+        }
+    }
+
+	public void selectStriker(int intIndex){
+		strikerName = strikers[intIndex][0];
+		strikerAccuracy = Integer.parseInt(strikers[intIndex][1]);
+		strikerPower = Integer.parseInt(strikers[intIndex][2]);
+
+		if(intPicking == 1){
+			strP1S = strikerName;
+			intP1SAcc = strikerAccuracy;
+			intP1SPwr = strikerPower;
+			blnP1S = true;
+			pickedSP1Label.setText("Striker: "+strikerName);
+		}else if(intPicking == 2){
+			strP2S = strikerName;
+			intP2SAcc = strikerAccuracy;
+			intP2SPwr = strikerPower;
+			blnP2S = true;
+			pickedSP2Label.setText("Striker: "+strikerName);
+		}
+
+		System.out.println("Name: " + strikerName);
+		System.out.println("Accuracy: " + strikerAccuracy);
+		System.out.println("Power: " + strikerPower);
+	}
+
+	public void selectKeeper(int intIndex){
+		keeperName = keepers[intIndex][0];
+		keeperAgility = Integer.parseInt(keepers[intIndex][1]);
+		keeperCoverage = Integer.parseInt(keepers[intIndex][2]);
+
+		if(intPicking == 1){
+			strP1K = keeperName;
+			intP1KAgi = keeperAgility;
+			intP1KCvg = keeperCoverage;
+			blnP1K = true;
+			pickedKP1Label.setText("Keeper: "+keeperName);
+		}else if(intPicking == 2){
+			strP2K = keeperName;
+			intP2KAgi = keeperAgility;
+			intP2KCvg = keeperCoverage;
+			blnP2K = true;
+			pickedKP2Label.setText("Keeper: "+keeperName);
+		}
+
+		System.out.println("Name: " + keeperName);
+		System.out.println("Agility: " + keeperAgility);
+		System.out.println("Coverage: " + keeperCoverage);
+	}
+    
     //For action listener
 	public void actionPerformed(ActionEvent evt){
 		//Going into the play menu to connect to server
@@ -136,26 +235,23 @@ public class soccerMain extends JPanel implements ActionListener {
 			System.out.println("Waiting for connection");
 		}
 		
-		//Attempting to connect 
 		if(evt.getSource() == clientButton){	
-		strServerID = JOptionPane.showInputDialog(theFrame, "Enter IP: ", "Connect", JOptionPane.PLAIN_MESSAGE);
-		
-			//If the user clicks cancel or leaves it blank, do not try connecting
+			strServerID = JOptionPane.showInputDialog(theFrame, "Enter IP: ", "Connect", JOptionPane.PLAIN_MESSAGE);
+			
 			if(strServerID == null || strServerID.equals("")){
 				JOptionPane.showMessageDialog(theFrame, "Please enter an IP address.");
-			}else{ //If the user entered an IP, try to connect to it
+			}else{
 				connectSSM = new SuperSocketMaster(strServerID, 6112, this);
 				System.out.println("Entered IP: "+strServerID);
 				
-				//Successful connection
 				if(connectSSM.connect() == true){
 					System.out.println("CONNECTED");
 					
 					connectSSM.sendText("Joined");
-				}else{ //Unsuccessful connection
+				}else{
 					blnConnected = false;
 					connectSSM = null;
-					JOptionPane.showMessageDialog(theFrame, "Could not connect. Try again.");
+					JOptionPane.showMessageDialog(theFrame, "Could not connect. Try the IP again.");
 				}
 			}
 		}
@@ -167,7 +263,6 @@ public class soccerMain extends JPanel implements ActionListener {
 			
 			String strSplit[] = strNetText.split(",");
 			
-			//If the client joined, the host receives this message
 			if(strSplit[0].equals("Joined")){
 				blnConnected = true;
 				connectSSM.sendText("Start");
@@ -178,24 +273,23 @@ public class soccerMain extends JPanel implements ActionListener {
 				setConnectVisible(false);
 				setSelectionVisible(true);
 				thePanel.repaint();
-			}else if(strSplit[0].equals("Start")){ //If the host sends Start, the client receives this message
+			}else if(strSplit[0].equals("Start")){
 				blnConnected = true;
 				System.out.println("Server started game");
-			}else if(strSplit[0].equals("LIVE")){ //If the other player clicks a keeper or striker before confirming
+			}else if(strSplit[0].equals("LIVE")) {
 				String strType = strSplit[1];   
 				String strName = strSplit[2];  
 				
-				//If the live update and store name
-				if(strType.equals("K")){ 
+				if(strType.equals("K")) {
 					if(intPicking == 1) strP2K = strName; 
 					else strP1K = strName;
 					pickedKP2Label.setText("Opponent Keeper: " + strName);
-				}else if(strType.equals("S")){ 
+				} else if(strType.equals("S")) {
 					if(intPicking == 1) strP2S = strName;
 					else strP1S = strName;
 					pickedSP2Label.setText("Opponent Striker: " + strName);
 				}
-			}else if(strSplit[0].equals("Picks")){ //If the other player confirmed their final picks
+			}else if(strSplit[0].equals("Picks")){
 				strP2K = strSplit[1];
 				intP2KAgi = Integer.parseInt(strSplit[2]);
 				intP2KCvg = Integer.parseInt(strSplit[3]);
@@ -220,104 +314,6 @@ public class soccerMain extends JPanel implements ActionListener {
 			setConnectVisible(false);
 			setSelectionVisible(true);
 			thePanel.repaint();
-		}
-		
-		//Getting player stats for player 1(host)
-		if(intPicking == 1){
-			if(evt.getSource() == K1Button){
-				strP1K = strKeepers[0][0];
-				intP1KAgi = Integer.parseInt(strKeepers[0][1]);
-				intP1KCvg = Integer.parseInt(strKeepers[0][2]);
-				blnP1K = true;
-				pickedKP1Label.setText("Keeper: "+strP1K);
-				connectSSM.sendText("LIVE,K," + strP1K);
-			}else if(evt.getSource() == K2Button){
-				strP1K = strKeepers[1][0];
-				intP1KAgi = Integer.parseInt(strKeepers[1][1]);
-				intP1KCvg = Integer.parseInt(strKeepers[1][2]);
-				blnP1K = true;
-				pickedKP1Label.setText("Keeper: "+strP1K);
-				connectSSM.sendText("LIVE,K," + strP1K);
-			}else if(evt.getSource() == K3Button){
-				strP1K = strKeepers[2][0];
-				intP1KAgi = Integer.parseInt(strKeepers[2][1]);
-				intP1KCvg = Integer.parseInt(strKeepers[2][2]);
-				blnP1K = true;
-				pickedKP1Label.setText("Keeper: "+strP1K);
-				connectSSM.sendText("LIVE,K," + strP1K);
-			}
-			
-			if(evt.getSource() == S1Button){
-				strP1S = strStrikers[0][0];
-				intP1SAcc = Integer.parseInt(strStrikers[0][1]);
-				intP1SPwr = Integer.parseInt(strStrikers[0][2]);
-				blnP1S = true;
-				pickedSP1Label.setText("Striker: "+strP1S);
-				connectSSM.sendText("LIVE,S," + strP1S);
-			}else if(evt.getSource() == S2Button){
-				strP1S = strStrikers[1][0];
-				intP1SAcc = Integer.parseInt(strStrikers[1][1]);
-				intP1SPwr = Integer.parseInt(strStrikers[1][2]);
-				blnP1S = true;
-				pickedSP1Label.setText("Striker: "+strP1S);
-				connectSSM.sendText("LIVE,S," + strP1S);
-			}else if(evt.getSource() == S3Button){
-				strP1S = strStrikers[2][0];
-				intP1SAcc = Integer.parseInt(strStrikers[2][1]);
-				intP1SPwr = Integer.parseInt(strStrikers[2][2]);
-				blnP1S = true;
-				pickedSP1Label.setText("Striker: "+strP1S);
-				connectSSM.sendText("LIVE,S," + strP1S);
-			}
-		}				
-				
-		//Getting player stats for player 2(client)
-		else if(intPicking == 2){
-			if(evt.getSource() == K1Button){
-				strP2K = strKeepers[0][0];
-				intP2KAgi = Integer.parseInt(strKeepers[0][1]);
-				intP2KCvg = Integer.parseInt(strKeepers[0][2]);
-				blnP2K = true;
-				pickedKP2Label.setText("Keeper: "+strP2K);
-				connectSSM.sendText("LIVE,K," + strP2K);
-			}else if(evt.getSource() == K2Button){
-				strP2K = strKeepers[1][0];
-				intP2KAgi = Integer.parseInt(strKeepers[1][1]);
-				intP2KCvg = Integer.parseInt(strKeepers[1][2]);
-				blnP2K = true;
-				pickedKP2Label.setText("Keeper: "+strP2K);
-				connectSSM.sendText("LIVE,K," + strP2K);
-			}else if(evt.getSource() == K3Button){
-				strP2K = strKeepers[2][0];
-				intP2KAgi = Integer.parseInt(strKeepers[2][1]);
-				intP2KCvg = Integer.parseInt(strKeepers[2][2]);
-				blnP2K = true;
-				pickedKP2Label.setText("Keeper: "+strP2K);
-				connectSSM.sendText("LIVE,K," + strP2K);
-			}
-			
-			if(evt.getSource() == S1Button){
-				strP2S = strStrikers[0][0];
-				intP2SAcc = Integer.parseInt(strStrikers[0][1]);
-				intP2SPwr = Integer.parseInt(strStrikers[0][2]);
-				blnP2S = true;
-				pickedSP2Label.setText("Striker: "+strP2S);
-				connectSSM.sendText("LIVE,S," + strP2S);
-			}else if(evt.getSource() == S2Button){
-				strP2S = strStrikers[1][0];
-				intP2SAcc = Integer.parseInt(strStrikers[1][1]);
-				intP2SPwr = Integer.parseInt(strStrikers[1][2]);
-				blnP2S = true;
-				pickedSP2Label.setText("Striker: "+strP2S);
-				connectSSM.sendText("LIVE,S," + strP2S);
-			}else if(evt.getSource() == S3Button){
-				strP2S = strStrikers[2][0];
-				intP2SAcc = Integer.parseInt(strStrikers[2][1]);
-				intP2SPwr = Integer.parseInt(strStrikers[2][2]);
-				blnP2S = true;
-				pickedSP2Label.setText("Striker: "+strP2S);
-				connectSSM.sendText("LIVE,S," + strP2S);
-			}
 		}
 		
 		//Finalizing and locking in picks
@@ -400,40 +396,7 @@ public class soccerMain extends JPanel implements ActionListener {
 			}
 		}
 	};
-	
-	//Reading player CSV
-	public void loadCSV(){	
-		strStrikers = new String[3][3];
-		TextInputFile playersFile = new TextInputFile("players.csv");
-
-		intCount = 0;
-		while(playersFile.eof() == false){
-			String strLine = playersFile.readLine();
-			String strSplit[] = strLine.split(",");
-
-			strStrikers[intCount][0] = strSplit[0].trim();
-			strStrikers[intCount][1] = strSplit[1].trim();
-			strStrikers[intCount][2] = strSplit[2].trim();
-
-			intCount++;
-		}
-
-		strKeepers = new String[3][3];
-		TextInputFile keepersFile = new TextInputFile("keepers.csv");
-
-		intCount = 0;
-		while(keepersFile.eof() == false){
-			String strLine = keepersFile.readLine();
-			String strSplit[] = strLine.split(",");
-
-			strKeepers[intCount][0] = strSplit[0].trim();
-			strKeepers[intCount][1] = strSplit[1].trim();
-			strKeepers[intCount][2] = strSplit[2].trim();
-
-			intCount++;
-		}
-	}	
-	
+		
 	//Setting menus to visible or invisible
 	public void setMainVisible(boolean blnVisible){
 		for(JComponent c:mainMenu){
@@ -499,13 +462,13 @@ public class soccerMain extends JPanel implements ActionListener {
 		//Player stats
 		loadCSV();
 		
-		K1Button.setText(strKeepers[0][0]);
-		K2Button.setText(strKeepers[1][0]);
-		K3Button.setText(strKeepers[2][0]);
+		K1Button.setText(keepers[0][0]);
+		K2Button.setText(keepers[1][0]);
+		K3Button.setText(keepers[2][0]);
 		
-		S1Button.setText(strStrikers[0][0]);
-		S2Button.setText(strStrikers[1][0]);
-		S3Button.setText(strStrikers[2][0]);
+		S1Button.setText(strikers[0][0]);
+		S2Button.setText(strikers[1][0]);
+		S3Button.setText(strikers[2][0]);	
 		
 		K1Button.addActionListener(this);
 		K2Button.addActionListener(this);

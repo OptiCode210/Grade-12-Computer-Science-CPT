@@ -33,10 +33,47 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     // Power line moves horizontally between X: 1020 and 1260
 	int intPowerLineX = 1140;     
 
-    // --- DEFINED ANIMATION SPEED VARIABLES ---
+    // ANIMATION SPEED VARIABLES
+    
+    
+    
+    
+    
+    
+    
+    
+    //Chris you can use these according to the stat of the players
+
+
+
+
+
+
+
+
+
+    //
     int intLeftRightSpeed = 4;
     int intUpDownSpeed = 5;
     int intPowerSpeed = 6;
+    
+    
+    
+    //
+    //
+    //
+    //
+    // --- NEW MECHANICAL & CONVERSION TRACKERS ---
+    int intStage = 1; 
+    //Stageexplain
+    // 1 = Left/Right, 2 = Up/Down, 3 = Power, 4 = Shot Locked / Complete
+    int intFinalLeftRightX = 0;
+    int intFinalUpDownY = 0;
+    int intFinalPowerX = 0;
+
+    double dblFinalLeftRightPercent = 0.0;
+    double dblFinalUpDownPercent = 0.0;
+    double dblFinalPowerPercent = 0.0;
 
     //images
     BufferedImage imgBG = null;
@@ -49,9 +86,9 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     }
 
     public void actionPerformed(ActionEvent evt){
-		// Call the move method every time the timer ticks (60 times a second)
+        // Move sliders only according to our current active stage
         moveSliders();
-        // Force the screen to refresh and redraw the white bars at their new positions
+        // Refresh the screen
         repaint();
     }
 
@@ -60,7 +97,8 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     }
 
     public void keyReleased(KeyEvent evt){
-
+        // Pass the key event data into your custom method
+        spacebarinput(evt);
     }
 
     public void keyTyped(KeyEvent evt){
@@ -128,22 +166,26 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
         g.fillRect(intPowerLineX - 2, intPowerY, 4, intPowerHeight); 
     }
     public void moveSliders() {
-        //Move and Bounce Meter 1: Left/Right
-        intLeftRightLineX += intLeftRightSpeed;
-        if (intLeftRightLineX <= 1020 || intLeftRightLineX >= 1260) {
-            intLeftRightSpeed = -intLeftRightSpeed; // Reverse direction
+        // Stage 1 active: Only move the Left/Right bar
+        if (intStage == 1) {
+            intLeftRightLineX += intLeftRightSpeed;
+            if (intLeftRightLineX <= 1020 || intLeftRightLineX >= 1260) {
+                intLeftRightSpeed = -intLeftRightSpeed;
+            }
         }
-
-        //Move and Bounce Meter 2: Up/Down 
-        intUpDownLineY += intUpDownSpeed;
-        if (intUpDownLineY <= 230 || intUpDownLineY >= 470) {
-            intUpDownSpeed = -intUpDownSpeed; // Reverse direction
+        // Stage 2 active: Only move the Up/Down bar
+        else if (intStage == 2) {
+            intUpDownLineY += intUpDownSpeed;
+            if (intUpDownLineY <= 230 || intUpDownLineY >= 470) {
+                intUpDownSpeed = -intUpDownSpeed;
+            }
         }
-
-        //Move and Bounce Meter 3: Power 
-        intPowerLineX += intPowerSpeed;
-        if (intPowerLineX <= 1020 || intPowerLineX >= 1260) {
-            intPowerSpeed = -intPowerSpeed; // Reverse direction
+        // Stage 3 active: Only move the Power bar
+        else if (intStage == 3) {
+            intPowerLineX += intPowerSpeed;
+            if (intPowerLineX <= 1020 || intPowerLineX >= 1260) {
+                intPowerSpeed = -intPowerSpeed;
+            }
         }
     }
     public void paintComponent(Graphics g){
@@ -164,6 +206,38 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
             System.out.println("image error");
         }
     }
+    public void spacebarinput(KeyEvent evt){
+		// Listen for the Space Bar press
+        if (evt.getKeyCode() == KeyEvent.VK_SPACE) {
+            // STAGE 1: Lock Left/Right, Move to Up/Down
+            if (intStage == 1) {
+                intFinalLeftRightX = intLeftRightLineX;
+                // Convert to percentage (0.0 = Leftmost edge, 100.0 = Rightmost edge)
+                dblFinalLeftRightPercent = ((double)(intFinalLeftRightX - 1020) / 240.0) * 100.0;
+                System.out.println("Left/Right Locked! X: " + intFinalLeftRightX + " (" + (int)dblFinalLeftRightPercent + "%)");             
+                intStage = 2;
+            }
+            // STAGE 2: Lock Up/Down, Move to Power
+            else if (intStage == 2) {
+                intFinalUpDownY = intUpDownLineY;              
+                // Convert to percentage (0.0 = Topmost edge, 100.0 = Bottommost edge)
+                dblFinalUpDownPercent = ((double)(intFinalUpDownY - 230) / 240.0) * 100.0;
+                System.out.println("Up/Down Locked! Y: " + intFinalUpDownY + " (" + (int)dblFinalUpDownPercent + "%)");               
+                intStage = 3;
+            }
+            // STAGE 3: Lock Power, Convert All Values and trigger calculations
+            else if (intStage == 3) {
+                intFinalPowerX = intPowerLineX;              
+                // Convert to percentage (0.0 = Green/Low Power, 100.0 = Red/Max Power)
+                dblFinalPowerPercent = ((double)(intFinalPowerX - 1020) / 240.0) * 100.0;
+                System.out.println("Power Locked! X: " + intFinalPowerX + " (" + (int)dblFinalPowerPercent + "%)");               
+                intStage = 4; // All tracking complete!
+                System.out.println("--- READY TO SHOOT ---");
+                System.out.println("Final Shot Vectors: Aim X % = " + (int)dblFinalLeftRightPercent + " | Aim Y % = " + (int)dblFinalUpDownPercent + " | Power % = " + (int)dblFinalPowerPercent);
+            }
+        }
+		
+	}
 
 
     // Constructor
@@ -202,6 +276,7 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
 
         //load images
         loadIMG();
+
         //end window (temp)
         theFrame.setContentPane(this);
         theFrame.setDefaultCloseOperation(3);
@@ -209,7 +284,6 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
         theFrame.setVisible(true);
 
     }
-
     // Main program
     public static void main(String[] args){
         new shootingMechanic();

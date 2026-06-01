@@ -29,6 +29,7 @@ public class soccerMain extends JPanel implements ActionListener {
     //Main menu
 	JButton helpButton = new JButton("Help");
 	JButton playButton = new JButton("Play");
+	JLabel titleLabel = new JLabel("Penalty Shootout");
 	JComponent[] mainMenu;
 	
 	//Connect
@@ -358,6 +359,10 @@ public class soccerMain extends JPanel implements ActionListener {
 			super.paintComponent(g);
 			
 			//Drawing images
+			if(menuBG != null){
+				g.drawImage(menuBG, 0, 0, 1280, 720, null);
+			}	
+			
 			if(blnConnected == true){		
 				if(blnConnected == true){
 					if(menuBG != null){
@@ -392,7 +397,7 @@ public class soccerMain extends JPanel implements ActionListener {
 					if(K3Card != null){
 						g.drawImage(K3Card, 1056, 100, 190, 240, null);
 					}
-				}				
+				}		
 			}
 		}
 	};
@@ -426,17 +431,31 @@ public class soccerMain extends JPanel implements ActionListener {
 		thePanel.setPreferredSize(new Dimension(1280, 720));
 		
 		//Main menu
-		playButton.setBounds(0,0,300,100);
+		playButton.setBounds(490, 260, 300, 70);
+		playButton.setFont(new Font("Arial", Font.BOLD, 28));
+		playButton.setBackground(new Color(30, 120, 60));
+		playButton.setForeground(Color.WHITE);
+		playButton.setFocusPainted(false);
 		playButton.addActionListener(this);
 		thePanel.add(playButton);
 		
-		helpButton.setBounds(0,300,300,100);
+		helpButton.setBounds(490, 350, 300, 70);
+		helpButton.setFont(new Font("Arial", Font.BOLD, 28));
+		helpButton.setBackground(new Color(40, 70, 140));
+		helpButton.setForeground(Color.WHITE);
+		helpButton.setFocusPainted(false);
 		helpButton.addActionListener(this);
 		thePanel.add(helpButton);
 		
+		titleLabel.setBounds(0, 110, 1280, 100);
+		titleLabel.setFont(new Font("Arial", Font.BOLD, 72));
+		titleLabel.setForeground(Color.WHITE);
+		titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		thePanel.add(titleLabel);
+		
 		//Main menu pannel into a list
 		mainMenu = new JComponent[]{
-			playButton, helpButton
+			playButton, helpButton, titleLabel
 		};
 				
 		//Connect menu

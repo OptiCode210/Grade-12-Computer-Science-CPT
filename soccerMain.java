@@ -459,16 +459,16 @@ public class soccerMain extends JPanel implements ActionListener {
 		};
 				
 		//Connect menu
-		serverButton.setBounds(0,0,300,100);
+		serverButton.setBounds(330,260,300,100);
 		serverButton.addActionListener(this);
 		thePanel.add(serverButton);
 		
-		clientButton.setBounds(0,300,300,100);
+		clientButton.setBounds(650,260,300,100);
 		clientButton.addActionListener(this);
 		thePanel.add(clientButton);
 		
 		IPLabel.setBounds(780, 10, 500, 30);
-		IPLabel.setForeground(Color.BLACK);
+		IPLabel.setForeground(Color.WHITE);
 		IPLabel.setFont(new Font("Arial", Font.BOLD, 20));
 		thePanel.add(IPLabel);
 	

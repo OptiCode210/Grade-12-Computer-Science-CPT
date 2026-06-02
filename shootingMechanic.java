@@ -6,66 +6,44 @@ import java.io.IOException;
 import javax.imageio.*;
 import java.io.File;
 
-public class shootingMechanic extends JPanel implements ActionListener, KeyListener{
+public class shootingMechanic extends JPanel implements ActionListener, KeyListener {
     // Properties
     int intfps = 60;  
-    //temp Jcomponents
-    JFrame theFrame = new JFrame("trial");
-    Timer theTimer = new Timer(1000/intfps, this);
+    // temp Jcomponents
+    JFrame theFrame = new JFrame("Trial Shooting Mechanic");
+    Timer theTimer = new Timer(1000 / intfps, this);
+    
     // --- JLABEL PROPERTIES ---
     JLabel lblLeftRight = new JLabel("Left / Right");
     JLabel lblUpDown = new JLabel("Up / Down");
     JLabel lblPower = new JLabel("Power");
-    //variables
+    
+    // variables
     String strikerName = "Striker Name";
     int strikerAccuracy = 9;
     int strikerPower = 2;
     String keeperName = "Keeper Name";
     int keeperAgility = 9;
     int keeperCoverage = 2;     
-    //Ball variables
-    int intBallX = 610;
+    
+    // --- FIXED BALL VARIABLES (Centered with the goal at X: 130) ---
+    int intBallX = 610; // Changed from 610 to center it perfectly with the net
     int intBallY = 550;
+    
     // Left/Right line moves horizontally between X: 1020 and 1260
     int intLeftRightLineX = 1140; 
     // Up/Down line moves vertically between Y: 230 and 470
     int intUpDownLineY = 350;    
     // Power line moves horizontally between X: 1020 and 1260
-	int intPowerLineX = 1140;     
+    int intPowerLineX = 1140;     
 
     // ANIMATION SPEED VARIABLES
-    
-    
-    
-    
-    
-    
-    
-    
-    //Chris you can use these according to the stat of the players
-
-
-
-
-
-
-
-
-
-    //
     int intLeftRightSpeed = 4;
     int intUpDownSpeed = 5;
     int intPowerSpeed = 6;
     
-    
-    
-    //
-    //
-    //
-    //
     // --- NEW MECHANICAL & CONVERSION TRACKERS ---
     int intStage = 1; 
-    //Stageexplain
     // 1 = Left/Right, 2 = Up/Down, 3 = Power, 4 = Shot Locked / Complete
     int intFinalLeftRightX = 0;
     int intFinalUpDownY = 0;
@@ -75,40 +53,64 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     double dblFinalUpDownPercent = 0.0;
     double dblFinalPowerPercent = 0.0;
 
-    //images
+    // images
     BufferedImage imgBG = null;
     BufferedImage imgGoal = null;
     BufferedImage imgBall = null;
+    
+    // --- NEW SHOOTING ANIMATION VARIABLES ---
+    boolean isShooting = false;
+    double dblBallX = 610.0; 
+    double dblBallY = 550.0;
+    double dblTargetX = 0.0;
+    double dblTargetY = 0.0;
+    double dblVelX = 0.0;
+    double dblVelY = 0.0;
+    int intShotFrameCount = 0;
 
-    //methods
-    public void loadCSV(){
-
+    // methods
+    public void loadCSV() {
     }
 
-    public void actionPerformed(ActionEvent evt){
+    public void actionPerformed(ActionEvent evt) {
         // Move sliders only according to our current active stage
-        moveSliders();
+        if (intStage < 4) {
+            moveSliders();
+        }
+        if (isShooting) {
+            animateBall();
+        }
+
         // Refresh the screen
         repaint();
     }
 
-    public void keyPressed(KeyEvent evt){
-
+    public void keyPressed(KeyEvent evt) {
     }
 
-    public void keyReleased(KeyEvent evt){
+    public void keyReleased(KeyEvent evt) {
         // Pass the key event data into your custom method
         spacebarinput(evt);
+        if (evt.getKeyCode() == KeyEvent.VK_R && intStage == 4 && !isShooting) {
+            // Reset variables safely
+            intStage = 1;
+            intBallX = 610; // Resets to new center position
+            intBallY = 550;
+            intLeftRightLineX = 1140;
+            intUpDownLineY = 350;
+            intPowerLineX = 1140;
+            System.out.println("--- METER RESET ---");
+        }
     }
 
-    public void keyTyped(KeyEvent evt){
-
+    public void keyTyped(KeyEvent evt) {
     }
-	public void drawMeters(Graphics g) {
-		//Method to draw the 3 slider
+
+    public void drawMeters(Graphics g) {
         // Base background for the meter
         Color darkTrackBg = new Color(30, 30, 35);
-		// METER 1: LEFT / RIGHT
+        
+        // METER 1: LEFT / RIGHT
         g.setColor(Color.BLACK);
         g.fillRect(1016, 136, 248, 48);
         g.setColor(darkTrackBg);
@@ -120,6 +122,7 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
         g.fillRect(1256, 140, 4, 40);
         g.setColor(Color.WHITE); 
         g.fillRect(intLeftRightLineX - 2, 140, 4, 40); 
+        
         // METER 2: UP / DOWN 
         g.setColor(Color.BLACK);
         g.fillRect(1116, 226, 48, 248);
@@ -132,123 +135,174 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
         g.fillRect(1156, 230, 4, 240);
         g.setColor(Color.WHITE); 
         g.fillRect(1120, intUpDownLineY - 2, 40, 4); 
-		// METER 3: POWER (Horizontal, Dynamic Segmented Blocks)
+        
+        // METER 3: POWER
         int intPowerX = 1020;
         int intPowerY = 520;
         int intPowerWidth = 240;
         int intPowerHeight = 40;
-        // Draw the background behind blocks
+        
         g.setColor(Color.BLACK);
         g.fillRect(intPowerX - 4, intPowerY - 4, intPowerWidth + 8, intPowerHeight + 8);
         g.setColor(darkTrackBg);
         g.fillRect(intPowerX, intPowerY, intPowerWidth, intPowerHeight);
-        // Professional color-gradient segmented blocks (12 segments total)
+        
         int intSegments = 12;
         int intSegmentWidth = intPowerWidth / intSegments;
         for (int i = 0; i < intSegments; i++) {
-            // Calculate how far along we are using dblProgress (0.0 at start, 1.0 at end)
             double dblProgress = (double) i / (intSegments - 1);
-            // Linear interpolation using dblProgress: Fade from Green to Red
             int intRed = (int) (0 + dblProgress * (255 - 0));
             int intGreen = (int) (255 + dblProgress * (0 - 255));
             g.setColor(new Color(intRed, intGreen, 30));
-            // 3. Draw each individual color block perfectly spaced
             g.fillRect(intPowerX + (i * intSegmentWidth) + 2, intPowerY + 2, intSegmentWidth - 4, intPowerHeight - 4);
         }
-        // Heavy dark framework border to lock it in
+        
         g.setColor(Color.BLACK);
         g.fillRect(intPowerX, intPowerY, intPowerWidth, 4);
         g.fillRect(intPowerX, intPowerY + intPowerHeight - 4, intPowerWidth, 4);
         g.fillRect(intPowerX, intPowerY, 4, intPowerHeight);
         g.fillRect(intPowerX + intPowerWidth - 4, intPowerY, 4, intPowerHeight);
-        // Universal Crisp White Indicator over the colors
+        
         g.setColor(Color.WHITE);
         g.fillRect(intPowerLineX - 2, intPowerY, 4, intPowerHeight); 
     }
+
     public void moveSliders() {
-        // Stage 1 active: Only move the Left/Right bar
+        // Stage 1 active: Move Left/Right bar
         if (intStage == 1) {
             intLeftRightLineX += intLeftRightSpeed;
             if (intLeftRightLineX <= 1020 || intLeftRightLineX >= 1260) {
                 intLeftRightSpeed = -intLeftRightSpeed;
+                if (intLeftRightLineX < 1020) intLeftRightLineX = 1020;
+                if (intLeftRightLineX > 1260) intLeftRightLineX = 1260;
             }
         }
-        // Stage 2 active: Only move the Up/Down bar
+        // Stage 2 active: Move Up/Down bar
         else if (intStage == 2) {
             intUpDownLineY += intUpDownSpeed;
             if (intUpDownLineY <= 230 || intUpDownLineY >= 470) {
                 intUpDownSpeed = -intUpDownSpeed;
+                if (intUpDownLineY < 230) intUpDownLineY = 230;
+                if (intUpDownLineY > 470) intUpDownLineY = 470;
             }
         }
-        // Stage 3 active: Only move the Power bar
+        // Stage 3 active: Move Power bar
         else if (intStage == 3) {
             intPowerLineX += intPowerSpeed;
             if (intPowerLineX <= 1020 || intPowerLineX >= 1260) {
                 intPowerSpeed = -intPowerSpeed;
+                if (intPowerLineX < 1020) intPowerLineX = 1020;
+                if (intPowerLineX > 1260) intPowerLineX = 1260;
             }
         }
     }
-    public void paintComponent(Graphics g){
-		super.paintComponent(g);
-        //draw BG and goal
+
+    public void paintComponent(Graphics g) {
+        super.paintComponent(g);
         g.drawImage(imgBG, 0, 0, theFrame);
         g.drawImage(imgGoal, 130, 160, theFrame);
-        g.drawImage(imgBall,intBallX,intBallY,theFrame);
+        g.drawImage(imgBall, intBallX, intBallY, theFrame);
         drawMeters(g);
     }
 
-    public void loadIMG(){
-        try{
+    public void loadIMG() {
+        try {
             imgBG = ImageIO.read(new File("Images/shootingBG.jpeg"));
             imgGoal = ImageIO.read(new File("Images/Goal.png"));
             imgBall = ImageIO.read(new File("Images/ball.png"));
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("image error");
         }
     }
-    public void spacebarinput(KeyEvent evt){
-		// Listen for the Space Bar press
+
+    public void spacebarinput(KeyEvent evt) {
         if (evt.getKeyCode() == KeyEvent.VK_SPACE) {
-            // STAGE 1: Lock Left/Right, Move to Up/Down
+            // STAGE 1: Lock Left/Right
             if (intStage == 1) {
                 intFinalLeftRightX = intLeftRightLineX;
-                // Convert to percentage (0.0 = Leftmost edge, 100.0 = Rightmost edge)
-                dblFinalLeftRightPercent = ((double)(intFinalLeftRightX - 1020) / 240.0) * 100.0;
-                System.out.println("Left/Right Locked! X: " + intFinalLeftRightX + " (" + (int)dblFinalLeftRightPercent + "%)");             
+                if (intFinalLeftRightX < 1020) intFinalLeftRightX = 1020;
+                if (intFinalLeftRightX > 1260) intFinalLeftRightX = 1260;
+
+                dblFinalLeftRightPercent = ((double) (intFinalLeftRightX - 1020) / 240.0) * 100.0;
+                System.out.println("Left/Right Locked! X: " + intFinalLeftRightX + " (" + (int) dblFinalLeftRightPercent + "%)");             
                 intStage = 2;
             }
-            // STAGE 2: Lock Up/Down, Move to Power
+            // STAGE 2: Lock Up/Down
             else if (intStage == 2) {
                 intFinalUpDownY = intUpDownLineY;              
-                // Convert to percentage (0.0 = Topmost edge, 100.0 = Bottommost edge)
-                dblFinalUpDownPercent = ((double)(intFinalUpDownY - 230) / 240.0) * 100.0;
-                System.out.println("Up/Down Locked! Y: " + intFinalUpDownY + " (" + (int)dblFinalUpDownPercent + "%)");               
+                if (intFinalUpDownY < 230) intFinalUpDownY = 230;
+                if (intFinalUpDownY > 470) intFinalUpDownY = 470;
+
+                dblFinalUpDownPercent = ((double) (intFinalUpDownY - 230) / 240.0) * 100.0;
+                System.out.println("Up/Down Locked! Y: " + intFinalUpDownY + " (" + (int) dblFinalUpDownPercent + "%)");               
                 intStage = 3;
             }
-            // STAGE 3: Lock Power, Convert All Values and trigger calculations
+            // STAGE 3: Lock Power & Calculate Vectors
             else if (intStage == 3) {
                 intFinalPowerX = intPowerLineX;              
-                // Convert to percentage (0.0 = Green/Low Power, 100.0 = Red/Max Power)
-                dblFinalPowerPercent = ((double)(intFinalPowerX - 1020) / 240.0) * 100.0;
-                System.out.println("Power Locked! X: " + intFinalPowerX + " (" + (int)dblFinalPowerPercent + "%)");               
-                intStage = 4; // All tracking complete!
-                System.out.println("--- READY TO SHOOT ---");
-                System.out.println("Final Shot Vectors: Aim X % = " + (int)dblFinalLeftRightPercent + " | Aim Y % = " + (int)dblFinalUpDownPercent + " | Power % = " + (int)dblFinalPowerPercent);
+                if (intFinalPowerX < 1020) intFinalPowerX = 1020;
+                if (intFinalPowerX > 1260) intFinalPowerX = 1260;
+
+                dblFinalPowerPercent = ((double) (intFinalPowerX - 1020) / 240.0) * 100.0;
+                System.out.println("Power Locked! X: " + intFinalPowerX + " (" + (int) dblFinalPowerPercent + "%)");                
+                
+                // Real goal positions based on your g.drawImage(imgGoal, 130, 160...)
+                int goalLeft = 140; 
+                int goalWidth = 500;
+                int goalTop = 160;
+                int goalHeight = 220;
+
+                // Accounting for ball sprite offset sizes (assuming standard sizes)
+                int ballWidth = 30;  
+                int ballHeight = 30; 
+
+                // Calculated clean dynamic targeting map
+                dblTargetX = goalLeft + ((dblFinalLeftRightPercent / 100.0) * goalWidth) - (ballWidth / 2.0);
+                dblTargetY = goalTop + ((dblFinalUpDownPercent / 100.0) * goalHeight) - (ballHeight / 2.0);
+
+                int totalFrames = (int) (60 - (dblFinalPowerPercent * 0.45)); 
+                if (totalFrames < 15) {
+                    totalFrames = 15;
+                } 
+
+                // Sync doubles to current ball coordinates
+                dblBallX = intBallX;
+                dblBallY = intBallY;
+                
+                // Generate trajectory vectors
+                dblVelX = (dblTargetX - dblBallX) / totalFrames;
+                dblVelY = (dblTargetY - dblBallY) / totalFrames;
+
+                isShooting = true;
+                intStage = 4; 
+                System.out.println("--- BALL KICKED --- Target X: " + (int) dblTargetX + " Y: " + (int) dblTargetY);
             }
         }
-		
-	}
+    }
 
+    public void animateBall() {
+        dblBallX += dblVelX;
+        dblBallY += dblVelY;
+        
+        intBallX = (int) dblBallX;
+        intBallY = (int) dblBallY;
+
+        // Check if ball crossed the visual threshold line
+        if (dblVelY < 0 && dblBallY <= dblTargetY) {
+            isShooting = false;
+            dblVelX = 0;
+            dblVelY = 0;
+            System.out.println("Shot finished at net!");
+        }
+    }
 
     // Constructor
-    public shootingMechanic(){
-        //start window (temp)
+    public shootingMechanic() {
         this.setLayout(null);
         this.setPreferredSize(new Dimension(1280, 720));
         this.setFocusable(true);
         this.addKeyListener(this);
 
-        // SETUP LABELS MANUALLY
         Font labelFont = new Font("Arial Black", Font.PLAIN, 18);
         int labelWidth = 200;
         int labelHeight = 30;
@@ -268,24 +322,18 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
         lblPower.setFont(labelFont);
         this.add(lblPower);
 
-        //start timer
         theTimer.start();
-
-        //repaint
         repaint();
-
-        //load images
         loadIMG();
 
-        //end window (temp)
         theFrame.setContentPane(this);
-        theFrame.setDefaultCloseOperation(3);
+        theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         theFrame.pack();
         theFrame.setVisible(true);
-
     }
-    // Main program
-    public static void main(String[] args){
+
+    // Main
+    public static void main(String[] args) {
         new shootingMechanic();
     }
 }

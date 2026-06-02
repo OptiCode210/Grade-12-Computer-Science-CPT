@@ -32,14 +32,21 @@ public class soccerMain extends JPanel implements ActionListener {
 	JLabel titleLabel = new JLabel("Penalty Shootout");
 	JComponent[] mainMenu;
 	
+	//Help menu
+	JLabel helpTitleLabel  = new JLabel("How to Play");
+	JButton backButton = new JButton("Back");
+	JComponent[] helpMenu;
+	
 	//Connect
 	JLabel serverLabel = new JLabel("Server");
 	JLabel clientLabel = new JLabel("Client");
-	JLabel IPLabel = new JLabel("");
+	JLabel connectTitleLabel = new JLabel("Connect");
+	JLabel IPLabel = new JLabel("IP: ");
 	JTextField serverField = new JTextField();
 	JTextField clientField = new JTextField();
 	JButton serverButton = new JButton("Host");
 	JButton clientButton = new JButton("Join");
+	JButton connectBackButton = new JButton("Back");
 	String strServerID;
 	String strServerIP;
 	JComponent[] connectMenu;
@@ -191,6 +198,10 @@ public class soccerMain extends JPanel implements ActionListener {
 		System.out.println("Name: " + strikerName);
 		System.out.println("Accuracy: " + strikerAccuracy);
 		System.out.println("Power: " + strikerPower);
+		
+		if(connectSSM != null){
+			connectSSM.sendText("LIVE,S," + strikerName);
+		}
 	}
 
 	public void selectKeeper(int intIndex){
@@ -215,6 +226,10 @@ public class soccerMain extends JPanel implements ActionListener {
 		System.out.println("Name: " + keeperName);
 		System.out.println("Agility: " + keeperAgility);
 		System.out.println("Coverage: " + keeperCoverage);
+		
+		if(connectSSM != null){
+			connectSSM.sendText("LIVE,K," + keeperName);
+		}
 	}
     
     //For action listener
@@ -223,6 +238,16 @@ public class soccerMain extends JPanel implements ActionListener {
 		if(evt.getSource() == playButton){
 			setMainVisible(false);
 			setConnectVisible(true);
+		}
+		
+		//Back button from connect menu
+		if(evt.getSource() == connectBackButton){
+			setConnectVisible(false);
+			setHelpVisible(false);
+			setSelectionVisible(false);
+			setMainVisible(true);
+			thePanel.repaint();
+			IPLabel.setText("IP: ");
 		}
 		
 		//Connecting to server
@@ -290,7 +315,7 @@ public class soccerMain extends JPanel implements ActionListener {
 					else strP1S = strName;
 					pickedSP2Label.setText("Opponent Striker: " + strName);
 				}
-			}else if(strSplit[0].equals("Picks")){
+			}else if(strSplit[0].equals("PICKS")){
 				strP2K = strSplit[1];
 				intP2KAgi = Integer.parseInt(strSplit[2]);
 				intP2KCvg = Integer.parseInt(strSplit[3]);
@@ -315,6 +340,23 @@ public class soccerMain extends JPanel implements ActionListener {
 			setConnectVisible(false);
 			setSelectionVisible(true);
 			thePanel.repaint();
+		}
+		
+		//Selections
+		if(evt.getSource() == K1Button){
+			selectKeeper(0);
+		}else if(evt.getSource() == K2Button){
+			selectKeeper(1);
+		}else if(evt.getSource() == K3Button){
+			selectKeeper(2);
+		}
+		
+		if(evt.getSource() == S1Button){
+			selectStriker(0);
+		}else if(evt.getSource() == S2Button){
+			selectStriker(1);
+		}else if(evt.getSource() == S3Button){
+			selectStriker(2);
 		}
 		
 		//Finalizing and locking in picks
@@ -350,6 +392,24 @@ public class soccerMain extends JPanel implements ActionListener {
 		if(blnSentPicks == true && blnReceivedPicks == true){
 			System.out.println("----------------------------------------");
 			System.out.println("Both ready! Proceed to comparison gameplay logic.");
+		}
+		
+		//Going to help screen
+		if(evt.getSource() == helpButton){
+			setMainVisible(false);
+			setConnectVisible(false);
+			setSelectionVisible(false);
+			setHelpVisible(true);
+			thePanel.repaint();
+		}
+		
+		//Back button from help screen
+		if(evt.getSource() == backButton){
+			setHelpVisible(false);
+			setConnectVisible(false);
+			setSelectionVisible(false);
+			setMainVisible(true);
+			thePanel.repaint();
 		}
 	}
 		
@@ -420,6 +480,12 @@ public class soccerMain extends JPanel implements ActionListener {
 			c.setVisible(blnVisible);
 		}
 	}
+	
+	public void setHelpVisible(boolean blnVisible){
+		for(JComponent c:helpMenu){
+			c.setVisible(blnVisible);
+		}
+	}
 
     //Constructor
     public soccerMain(){
@@ -459,23 +525,68 @@ public class soccerMain extends JPanel implements ActionListener {
 		};
 				
 		//Connect menu
-		serverButton.setBounds(0,0,300,100);
+		connectTitleLabel.setBounds(0, 110, 1280, 80);
+		connectTitleLabel.setFont(new Font("Arial", Font.BOLD, 64));
+		connectTitleLabel.setForeground(Color.WHITE);
+		connectTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		thePanel.add(connectTitleLabel);
+		
+		serverButton.setBounds(440, 280, 400, 70);
+		serverButton.setFont(new Font("Arial", Font.BOLD, 28));
+		serverButton.setBackground(new Color(30, 120, 60));
+		serverButton.setForeground(Color.WHITE);
+		serverButton.setFocusPainted(false);
 		serverButton.addActionListener(this);
 		thePanel.add(serverButton);
-		
-		clientButton.setBounds(0,300,300,100);
+
+		clientButton.setBounds(440, 380, 400, 70);
+		clientButton.setFont(new Font("Arial", Font.BOLD, 28));
+		clientButton.setBackground(new Color(40, 70, 140));
+		clientButton.setForeground(Color.WHITE);
+		clientButton.setFocusPainted(false);
 		clientButton.addActionListener(this);
 		thePanel.add(clientButton);
 		
-		IPLabel.setBounds(780, 10, 500, 30);
-		IPLabel.setForeground(Color.BLACK);
+		IPLabel.setBounds(465, 505, 350, 36);
+		IPLabel.setForeground(Color.WHITE);
+		IPLabel.setBackground(Color.BLACK);
+		IPLabel.setOpaque(true);
 		IPLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		IPLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		thePanel.add(IPLabel);
+		
+		connectBackButton.setBounds(40, 40, 180, 50);
+		connectBackButton.setFont(new Font("Arial", Font.BOLD, 22));
+		connectBackButton.setBackground(new Color(40, 70, 140));
+		connectBackButton.setForeground(Color.WHITE);
+		connectBackButton.setFocusPainted(false);
+		connectBackButton.addActionListener(this);
+		thePanel.add(connectBackButton);
 	
 		
 		//Conect menu pannel into a list
 		connectMenu = new JComponent[]{
-			serverButton, clientButton, IPLabel
+			serverButton, clientButton, IPLabel, connectTitleLabel, connectBackButton
+		};
+		
+		//Help menu
+		helpTitleLabel.setBounds(0, 120, 1280, 80);
+		helpTitleLabel.setFont(new Font("Arial", Font.BOLD, 64));
+		helpTitleLabel.setForeground(Color.WHITE);
+		helpTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		thePanel.add(helpTitleLabel);
+		
+		backButton.setBounds(40, 40, 180, 50);
+		backButton.setFont(new Font("Arial", Font.BOLD, 22));
+		backButton.setBackground(new Color(40, 70, 140));
+		backButton.setForeground(Color.WHITE);
+		backButton.setFocusPainted(false);
+		backButton.addActionListener(this);
+		thePanel.add(backButton);
+		
+		//Hel[p menu panel into a list
+		helpMenu = new JComponent[]{
+			helpTitleLabel, backButton
 		};
 		
 		//Player stats
@@ -593,6 +704,7 @@ public class soccerMain extends JPanel implements ActionListener {
 		setMainVisible(true);
 		setConnectVisible(false);
 		setSelectionVisible(false);
+		setHelpVisible(false);
 								
         //Finish window
         theFrame.setContentPane(thePanel);

@@ -79,6 +79,20 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     BufferedImage imgBG = null;
     BufferedImage imgGoal = null;
     BufferedImage imgBall = null;
+<<<<<<< HEAD
+=======
+    
+    // --- NEW SHOOTING ANIMATION VARIABLES ---
+    boolean isShooting = false;
+    double dblBallX = 610.0; 
+    double dblBallY = 550.0;
+    double dblTargetX = 0.0;
+    double dblTargetY = 0.0;
+    double dblShotStartX = 610.0;
+    double dblShotStartY = 550.0;
+    int intShotFrame = 0;
+    int intShotTotalFrames = 45;
+>>>>>>> 42fbb3fd0a7d41ef724937dccc4d772d50928e2b
 
     //methods
     public void loadCSV(){
@@ -228,17 +242,82 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
             // STAGE 3: Lock Power, Convert All Values and trigger calculations
             else if (intStage == 3) {
                 intFinalPowerX = intPowerLineX;              
+<<<<<<< HEAD
                 // Convert to percentage (0.0 = Green/Low Power, 100.0 = Red/Max Power)
                 dblFinalPowerPercent = ((double)(intFinalPowerX - 1020) / 240.0) * 100.0;
                 System.out.println("Power Locked! X: " + intFinalPowerX + " (" + (int)dblFinalPowerPercent + "%)");               
                 intStage = 4; // All tracking complete!
                 System.out.println("--- READY TO SHOOT ---");
                 System.out.println("Final Shot Vectors: Aim X % = " + (int)dblFinalLeftRightPercent + " | Aim Y % = " + (int)dblFinalUpDownPercent + " | Power % = " + (int)dblFinalPowerPercent);
+=======
+                if (intFinalPowerX < 1020) intFinalPowerX = 1020;
+                if (intFinalPowerX > 1260) intFinalPowerX = 1260;
+
+                dblFinalPowerPercent = ((double) (intFinalPowerX - 1020) / 240.0) * 100.0;
+                System.out.println("Power Locked! X: " + intFinalPowerX + " (" + (int) dblFinalPowerPercent + "%)");                
+                
+                int ballWidth = imgBall.getWidth();
+                int ballHeight = imgBall.getHeight();
+
+                // Target the open net area inside the goal image.
+                int goalLeft = 315;
+                int goalRight = 800;
+                int goalTop = 330;
+                int goalBottom = 450;
+
+                double targetCenterX = goalLeft + ((dblFinalLeftRightPercent / 100.0) * (goalRight - goalLeft));
+                double targetCenterY = goalTop + ((dblFinalUpDownPercent / 100.0) * (goalBottom - goalTop));
+                dblTargetX = targetCenterX - (ballWidth / 2.0);
+                dblTargetY = targetCenterY - (ballHeight / 2.0);
+
+                intShotTotalFrames = (int) (62 - (dblFinalPowerPercent * 0.40)); 
+                if (intShotTotalFrames < 18) {
+                    intShotTotalFrames = 18;
+                }
+
+                // Sync doubles to current ball coordinates
+                dblBallX = intBallX;
+                dblBallY = intBallY;
+                dblShotStartX = dblBallX;
+                dblShotStartY = dblBallY;
+                intShotFrame = 0;
+
+                isShooting = true;
+                intStage = 4; 
+                System.out.println("--- BALL KICKED --- Target X: " + (int) dblTargetX + " Y: " + (int) dblTargetY);
+>>>>>>> 42fbb3fd0a7d41ef724937dccc4d772d50928e2b
             }
         }
 		
 	}
 
+<<<<<<< HEAD
+=======
+    public void animateBall() {
+        intShotFrame++;
+        
+        double progress = (double) intShotFrame / intShotTotalFrames;
+        if (progress > 1.0) {
+            progress = 1.0;
+        }
+
+        double easedProgress = 1.0 - Math.pow(1.0 - progress, 3);
+        dblBallX = dblShotStartX + ((dblTargetX - dblShotStartX) * easedProgress);
+        dblBallY = dblShotStartY + ((dblTargetY - dblShotStartY) * easedProgress);
+        
+        intBallX = (int) Math.round(dblBallX);
+        intBallY = (int) Math.round(dblBallY);
+
+        if (progress >= 1.0) {
+            isShooting = false;
+            dblBallX = dblTargetX;
+            dblBallY = dblTargetY;
+            intBallX = (int) Math.round(dblTargetX);
+            intBallY = (int) Math.round(dblTargetY);
+            System.out.println("Shot finished at net!");
+        }
+    }
+>>>>>>> 42fbb3fd0a7d41ef724937dccc4d772d50928e2b
 
     // Constructor
     public shootingMechanic(){

@@ -361,6 +361,7 @@ public class soccerMain extends JPanel implements ActionListener {
 		
 		//Finalizing and locking in picks
 		if(evt.getSource() == confPickButton){
+			//Method this
 			boolean blnReady = (intPicking == 1 && blnP1K && blnP1S) || (intPicking == 2 && blnP2K && blnP2S);
 			
 			if(blnReady){

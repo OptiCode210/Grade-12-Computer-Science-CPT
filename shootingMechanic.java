@@ -64,9 +64,10 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     double dblBallY = 550.0;
     double dblTargetX = 0.0;
     double dblTargetY = 0.0;
-    double dblVelX = 0.0;
-    double dblVelY = 0.0;
-    int intShotFrameCount = 0;
+    double dblShotStartX = 610.0;
+    double dblShotStartY = 550.0;
+    int intShotFrame = 0;
+    int intShotTotalFrames = 45;
 
     // methods
     public void loadCSV() {
@@ -91,16 +92,6 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     public void keyReleased(KeyEvent evt) {
         // Pass the key event data into your custom method
         spacebarinput(evt);
-        if (evt.getKeyCode() == KeyEvent.VK_R && intStage == 4 && !isShooting) {
-            // Reset variables safely
-            intStage = 1;
-            intBallX = 610; // Resets to new center position
-            intBallY = 550;
-            intLeftRightLineX = 1140;
-            intUpDownLineY = 350;
-            intPowerLineX = 1140;
-            System.out.println("--- METER RESET ---");
-        }
     }
 
     public void keyTyped(KeyEvent evt) {
@@ -246,32 +237,31 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
                 dblFinalPowerPercent = ((double) (intFinalPowerX - 1020) / 240.0) * 100.0;
                 System.out.println("Power Locked! X: " + intFinalPowerX + " (" + (int) dblFinalPowerPercent + "%)");                
                 
-                // Real goal positions based on your g.drawImage(imgGoal, 130, 160...)
-                int goalLeft = 140; 
-                int goalWidth = 500;
-                int goalTop = 160;
-                int goalHeight = 220;
+                int ballWidth = imgBall.getWidth();
+                int ballHeight = imgBall.getHeight();
 
-                // Accounting for ball sprite offset sizes (assuming standard sizes)
-                int ballWidth = 30;  
-                int ballHeight = 30; 
+                // Target the open net area inside the goal image.
+                int goalLeft = 315;
+                int goalRight = 800;
+                int goalTop = 330;
+                int goalBottom = 450;
 
-                // Calculated clean dynamic targeting map
-                dblTargetX = goalLeft + ((dblFinalLeftRightPercent / 100.0) * goalWidth) - (ballWidth / 2.0);
-                dblTargetY = goalTop + ((dblFinalUpDownPercent / 100.0) * goalHeight) - (ballHeight / 2.0);
+                double targetCenterX = goalLeft + ((dblFinalLeftRightPercent / 100.0) * (goalRight - goalLeft));
+                double targetCenterY = goalTop + ((dblFinalUpDownPercent / 100.0) * (goalBottom - goalTop));
+                dblTargetX = targetCenterX - (ballWidth / 2.0);
+                dblTargetY = targetCenterY - (ballHeight / 2.0);
 
-                int totalFrames = (int) (60 - (dblFinalPowerPercent * 0.45)); 
-                if (totalFrames < 15) {
-                    totalFrames = 15;
-                } 
+                intShotTotalFrames = (int) (62 - (dblFinalPowerPercent * 0.40)); 
+                if (intShotTotalFrames < 18) {
+                    intShotTotalFrames = 18;
+                }
 
                 // Sync doubles to current ball coordinates
                 dblBallX = intBallX;
                 dblBallY = intBallY;
-                
-                // Generate trajectory vectors
-                dblVelX = (dblTargetX - dblBallX) / totalFrames;
-                dblVelY = (dblTargetY - dblBallY) / totalFrames;
+                dblShotStartX = dblBallX;
+                dblShotStartY = dblBallY;
+                intShotFrame = 0;
 
                 isShooting = true;
                 intStage = 4; 
@@ -281,17 +271,26 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     }
 
     public void animateBall() {
-        dblBallX += dblVelX;
-        dblBallY += dblVelY;
+        intShotFrame++;
         
-        intBallX = (int) dblBallX;
-        intBallY = (int) dblBallY;
+        double progress = (double) intShotFrame / intShotTotalFrames;
+        if (progress > 1.0) {
+            progress = 1.0;
+        }
 
-        // Check if ball crossed the visual threshold line
-        if (dblVelY < 0 && dblBallY <= dblTargetY) {
+        double easedProgress = 1.0 - Math.pow(1.0 - progress, 3);
+        dblBallX = dblShotStartX + ((dblTargetX - dblShotStartX) * easedProgress);
+        dblBallY = dblShotStartY + ((dblTargetY - dblShotStartY) * easedProgress);
+        
+        intBallX = (int) Math.round(dblBallX);
+        intBallY = (int) Math.round(dblBallY);
+
+        if (progress >= 1.0) {
             isShooting = false;
-            dblVelX = 0;
-            dblVelY = 0;
+            dblBallX = dblTargetX;
+            dblBallY = dblTargetY;
+            intBallX = (int) Math.round(dblTargetX);
+            intBallY = (int) Math.round(dblTargetY);
             System.out.println("Shot finished at net!");
         }
     }

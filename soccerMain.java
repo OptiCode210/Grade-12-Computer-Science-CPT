@@ -549,8 +549,7 @@ public class soccerMain extends JPanel implements ActionListener {
 		
 		IPLabel.setBounds(465, 505, 350, 36);
 		IPLabel.setForeground(Color.WHITE);
-		IPLabel.setBackground(Color.BLACK);
-		IPLabel.setOpaque(true);
+		thePanel.add(IPLabel);
 		
 		serverButton.setBounds(330,260,300,100);
 		serverButton.addActionListener(this);

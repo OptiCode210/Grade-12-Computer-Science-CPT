@@ -22,9 +22,7 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     String strikerName = "Striker Name";
     int strikerAccuracy = 9;
     int strikerPower = 2;
-    String keeperName = "Keeper Name";
-    int keeperAgility = 9;
-    int keeperCoverage = 2;     
+  
     
     // --- FIXED BALL VARIABLES (Centered with the goal at X: 130) ---
     int intBallX = 610; // Changed from 610 to center it perfectly with the net

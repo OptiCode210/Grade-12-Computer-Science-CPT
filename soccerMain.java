@@ -517,6 +517,8 @@ public class soccerMain extends JPanel implements ActionListener {
 		playButton.setBackground(new Color(30, 120, 60));
 		playButton.setForeground(Color.WHITE);
 		playButton.setFocusPainted(false);
+		playButton.setOpaque(true);
+		playButton.setBorderPainted(false);
 		playButton.addActionListener(this);
 		thePanel.add(playButton);
 
@@ -525,6 +527,8 @@ public class soccerMain extends JPanel implements ActionListener {
 		helpButton.setBackground(new Color(40, 70, 140));
 		helpButton.setForeground(Color.WHITE);
 		helpButton.setFocusPainted(false);
+		helpButton.setOpaque(true);
+		helpButton.setBorderPainted(false);
 		helpButton.addActionListener(this);
 		thePanel.add(helpButton);
 
@@ -551,6 +555,8 @@ public class soccerMain extends JPanel implements ActionListener {
 		serverButton.setBackground(new Color(30, 120, 60));
 		serverButton.setForeground(Color.WHITE);
 		serverButton.setFocusPainted(false);
+		serverButton.setOpaque(true);
+		serverButton.setBorderPainted(false);
 		serverButton.addActionListener(this);
 		thePanel.add(serverButton);
 
@@ -559,6 +565,8 @@ public class soccerMain extends JPanel implements ActionListener {
 		clientButton.setBackground(new Color(40, 70, 140));
 		clientButton.setForeground(Color.WHITE);
 		clientButton.setFocusPainted(false);
+		clientButton.setOpaque(true);
+		clientButton.setBorderPainted(false);
 		clientButton.addActionListener(this);
 		thePanel.add(clientButton);
 
@@ -585,6 +593,8 @@ public class soccerMain extends JPanel implements ActionListener {
 		connectBackButton.setBackground(new Color(40, 70, 140));
 		connectBackButton.setForeground(Color.WHITE);
 		connectBackButton.setFocusPainted(false);
+		connectBackButton.setOpaque(true);
+		connectBackButton.setBorderPainted(false);
 		connectBackButton.addActionListener(this);
 		thePanel.add(connectBackButton);
 
@@ -611,6 +621,8 @@ public class soccerMain extends JPanel implements ActionListener {
 		backButton.setBackground(new Color(40, 70, 140));
 		backButton.setForeground(Color.WHITE);
 		backButton.setFocusPainted(false);
+		backButton.setOpaque(true);
+		backButton.setBorderPainted(false);
 		backButton.addActionListener(this);
 		thePanel.add(backButton);
 
@@ -640,40 +652,40 @@ public class soccerMain extends JPanel implements ActionListener {
 
 		//Player selection images
 		try{
-			S1Front = ImageIO.read(new File("images/Strikers/S1Front.gif"));	
-			S1Run = ImageIO.read(new File("images/Strikers/S1Run.gif"));	
-			S1Shoot = ImageIO.read(new File("images/Strikers/S1Shoot.gif"));	
-			S1Stand = ImageIO.read(new File("images/Strikers/S1Stand.gif"));	
-			S1Card = ImageIO.read(new File("images/player cards/S1Card.png"));	
+			S1Front = ImageIO.read(new File("Images/Strikers/S1Front.gif"));	
+			S1Run = ImageIO.read(new File("Images/Strikers/S1Run.gif"));	
+			S1Shoot = ImageIO.read(new File("Images/Strikers/S1Shoot.gif"));	
+			S1Stand = ImageIO.read(new File("Images/Strikers/S1Stand.gif"));	
+			S1Card = ImageIO.read(new File("Images/player cards/S1Card.png"));	
 
-			S2Front = ImageIO.read(new File("images/Strikers/S2Front.gif"));	
-			S2Run = ImageIO.read(new File("images/Strikers/S2Run.gif"));	
-			S2Shoot = ImageIO.read(new File("images/Strikers/S2Shoot.gif"));	
-			S2Stand = ImageIO.read(new File("images/Strikers/S2Stand.gif"));
-			S2Card = ImageIO.read(new File("images/player cards/S2Card.png"));	
+			S2Front = ImageIO.read(new File("Images/Strikers/S2Front.gif"));	
+			S2Run = ImageIO.read(new File("Images/Strikers/S2Run.gif"));	
+			S2Shoot = ImageIO.read(new File("Images/Strikers/S2Shoot.gif"));	
+			S2Stand = ImageIO.read(new File("Images/Strikers/S2Stand.gif"));
+			S2Card = ImageIO.read(new File("Images/player cards/S2Card.png"));	
 
-			S3Front = ImageIO.read(new File("images/Strikers/S3Front.gif"));	
-			S3Run = ImageIO.read(new File("images/Strikers/S3Run.gif"));	
-			S3Shoot = ImageIO.read(new File("images/Strikers/S3Shoot.gif"));	
-			S3Stand = ImageIO.read(new File("images/Strikers/S3Stand.gif"));
-			S3Card = ImageIO.read(new File("images/player cards/S3Card.png"));	
+			S3Front = ImageIO.read(new File("Images/Strikers/S3Front.gif"));	
+			S3Run = ImageIO.read(new File("Images/Strikers/S3Run.gif"));	
+			S3Shoot = ImageIO.read(new File("Images/Strikers/S3Shoot.gif"));	
+			S3Stand = ImageIO.read(new File("Images/Strikers/S3Stand.gif"));
+			S3Card = ImageIO.read(new File("Images/player cards/S3Card.png"));	
 
-			K1Left = ImageIO.read(new File("images/keepers/K1Left.gif"));	
-			K1Right = ImageIO.read(new File("images/keepers/K1Right.gif"));	
-			K1Stand = ImageIO.read(new File("images/keepers/K1Stand.gif"));		
-			K1Card = ImageIO.read(new File("images/player cards/K1Card.png"));	
+			K1Left = ImageIO.read(new File("Images/keepers/K1Left.png"));	
+			K1Right = ImageIO.read(new File("Images/keepers/K1Right.png"));	
+			K1Stand = ImageIO.read(new File("Images/keepers/K1Stand.png"));		
+			K1Card = ImageIO.read(new File("Images/player cards/K1Card.png"));	
 
-			K2Left = ImageIO.read(new File("images/keepers/K2Left.gif"));	
-			K2Right = ImageIO.read(new File("images/keepers/K2Right.gif"));	
-			K2Stand = ImageIO.read(new File("images/keepers/K2Stand.gif"));	
-			K2Card = ImageIO.read(new File("images/player cards/K2Card.png"));	
+			K2Left = ImageIO.read(new File("Images/keepers/K2Left.png"));	
+			K2Right = ImageIO.read(new File("Images/keepers/K2Right.png"));	
+			K2Stand = ImageIO.read(new File("Images/keepers/K2Stand.png"));	
+			K2Card = ImageIO.read(new File("Images/player cards/K2Card.png"));	
 
-			K3Left = ImageIO.read(new File("images/keepers/K3Left.gif"));	
-			K3Right = ImageIO.read(new File("images/keepers/K3Right.gif"));	
-			K3Stand = ImageIO.read(new File("images/keepers/K3Stand.gif"));	
-			K3Card = ImageIO.read(new File("images/player cards/K3Card.png"));	
+			K3Left = ImageIO.read(new File("Images/keepers/K3Left.png"));	
+			K3Right = ImageIO.read(new File("Images/keepers/K3Right.png"));	
+			K3Stand = ImageIO.read(new File("Images/keepers/K3Stand.png"));	
+			K3Card = ImageIO.read(new File("Images/player cards/K3Card.png"));	
 
-			menuBG = ImageIO.read(new File("images/menuBG.jpg"));		
+			menuBG = ImageIO.read(new File("Images/menuBG.jpg"));		
 		}catch(IOException e){
 			System.out.println("Image unable to be loaded");
 			System.out.println(e);

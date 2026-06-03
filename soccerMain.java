@@ -34,6 +34,21 @@ public class soccerMain extends JPanel implements ActionListener {
 	
 	//Help menu
 	JLabel helpTitleLabel  = new JLabel("How to Play");
+	JLabel helpLabel = new JLabel("<html> Striker: <br>"+
+	"There are 3 sliders seen on the right side of the screen. <br>"+
+	"Left/Right: Determins how far left or right the ball goes. Press space locking in your decision <br>"+
+	"Up/Down: Determins how high or low the ball goes. Press space locking in your decision <br>"+
+	"Power: Determins how hard the shot is. Press space locking in your decision"+
+	"There are 2 abilities for each striker. <br>"+
+	"Accuracy: Slows down the Left/Right and Up/Down sliders for better accuracy <br>"+
+	"Power: Slows down the Power slider for better power selection"+
+	"<br><br> Keeper: <br>"+
+	"There are 2 sliders seen on the right side of the screen. <br>"+
+	"Left/Right: Determins how far left or right the goalie jumps. Press space locking in your decision <br>"+
+	"Power: Determins how high or low the goalie jumps. Press space locking in your decision"+
+	"There are 2 abilities for each striker. <br>"+
+	"Agility: Slows down the Left/Right and Up/Down sliders for better placment of your goalie <br>"+
+	"Coverage: Expands the hitbox on your goalie <br>");
 	JButton backButton = new JButton("Back");
 	JComponent[] helpMenu;
 	
@@ -586,6 +601,11 @@ public class soccerMain extends JPanel implements ActionListener {
 		helpTitleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		thePanel.add(helpTitleLabel);
 		
+		helpLabel.setBounds(10, 200, 1270, 520);
+		helpLabel.setFont(new Font("Arial", Font.BOLD, 20));
+		helpLabel.setForeground(Color.WHITE);
+		thePanel.add(helpLabel);
+		
 		backButton.setBounds(40, 40, 180, 50);
 		backButton.setFont(new Font("Arial", Font.BOLD, 22));
 		backButton.setBackground(new Color(40, 70, 140));
@@ -596,7 +616,7 @@ public class soccerMain extends JPanel implements ActionListener {
 		
 		//Hel[p menu panel into a list
 		helpMenu = new JComponent[]{
-			helpTitleLabel, backButton
+			helpTitleLabel, helpLabel, backButton
 		};
 		
 		//Player stats

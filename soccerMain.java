@@ -525,7 +525,6 @@ public class soccerMain extends JPanel implements ActionListener {
 		};
 				
 		//Connect menu
-<<<<<<< HEAD
 		connectTitleLabel.setBounds(0, 110, 1280, 80);
 		connectTitleLabel.setFont(new Font("Arial", Font.BOLD, 64));
 		connectTitleLabel.setForeground(Color.WHITE);
@@ -552,7 +551,7 @@ public class soccerMain extends JPanel implements ActionListener {
 		IPLabel.setForeground(Color.WHITE);
 		IPLabel.setBackground(Color.BLACK);
 		IPLabel.setOpaque(true);
-=======
+		
 		serverButton.setBounds(330,260,300,100);
 		serverButton.addActionListener(this);
 		thePanel.add(serverButton);
@@ -563,7 +562,6 @@ public class soccerMain extends JPanel implements ActionListener {
 		
 		IPLabel.setBounds(780, 10, 500, 30);
 		IPLabel.setForeground(Color.WHITE);
->>>>>>> f31530d2c9ca9a899d7e3e8558e8f0fb7d1e1806
 		IPLabel.setFont(new Font("Arial", Font.BOLD, 20));
 		IPLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		thePanel.add(IPLabel);

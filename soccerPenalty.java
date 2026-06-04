@@ -4,6 +4,7 @@ import java.awt.event.*;
 import javax.swing.event.*;
 
 //For Paint Compnent
+//backend
 public class soccerPenalty{
     //Properties
     int intBallX, intBallY;

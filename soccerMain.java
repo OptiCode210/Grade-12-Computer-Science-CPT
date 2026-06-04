@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 
+//frontend
 public class soccerMain extends JPanel implements ActionListener {
     //Properties
     JFrame theFrame = new JFrame("PENALTY!");
@@ -261,6 +262,7 @@ public class soccerMain extends JPanel implements ActionListener {
 			setHelpVisible(false);
 			setSelectionVisible(false);
 			setMainVisible(true);
+			thePanel.revalidate();
 			thePanel.repaint();
 			IPLabel.setText("IP: ");
 		}
@@ -282,13 +284,14 @@ public class soccerMain extends JPanel implements ActionListener {
 			if(strServerID == null || strServerID.equals("")){
 				JOptionPane.showMessageDialog(theFrame, "Please enter an IP address.");
 			}else{
-				connectSSM = new SuperSocketMaster(strServerID, 6112, this);
+				System.out.println("Entered IP: "+strServerID);
+				connectSSM = new SuperSocketMaster(strServerID, 6112, this);	//connection
 				System.out.println("Entered IP: "+strServerID);
 
 				if(connectSSM.connect() == true){
 					System.out.println("CONNECTED");
 
-					connectSSM.sendText("Joined");
+					connectSSM.sendText("Joined");	//prints to chat area
 				}else{
 					blnConnected = false;
 					connectSSM = null;
@@ -309,10 +312,11 @@ public class soccerMain extends JPanel implements ActionListener {
 				connectSSM.sendText("Start");
 				System.out.println("Client joined");
 
-				//Loading selection screen for client 
+				//Loading selection screen
 				setMainVisible(false);
 				setConnectVisible(false);
 				setSelectionVisible(true);
+				thePanel.revalidate();
 				thePanel.repaint();
 			}else if(strSplit[0].equals("Start")){
 				blnConnected = true;
@@ -334,7 +338,7 @@ public class soccerMain extends JPanel implements ActionListener {
 				strP2K = strSplit[1];
 				intP2KAgi = Integer.parseInt(strSplit[2]);
 				intP2KCvg = Integer.parseInt(strSplit[3]);
-
+				
 				strP2S = strSplit[4];
 				intP2SAcc = Integer.parseInt(strSplit[5]);
 				intP2SPwr = Integer.parseInt(strSplit[6]);
@@ -354,6 +358,7 @@ public class soccerMain extends JPanel implements ActionListener {
 			setMainVisible(false);
 			setConnectVisible(false);
 			setSelectionVisible(true);
+			thePanel.revalidate();
 			thePanel.repaint();
 		}
 
@@ -573,14 +578,6 @@ public class soccerMain extends JPanel implements ActionListener {
 		IPLabel.setBounds(465, 505, 350, 36);
 		IPLabel.setForeground(Color.WHITE);
 		thePanel.add(IPLabel);
-
-		serverButton.setBounds(330,260,300,100);
-		serverButton.addActionListener(this);
-		thePanel.add(serverButton);
-
-		clientButton.setBounds(650,260,300,100);
-		clientButton.addActionListener(this);
-		thePanel.add(clientButton);
 
 		IPLabel.setBounds(780, 10, 500, 30);
 		IPLabel.setForeground(Color.WHITE);

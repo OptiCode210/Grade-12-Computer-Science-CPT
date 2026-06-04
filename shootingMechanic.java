@@ -25,7 +25,7 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
   
     
     // --- FIXED BALL VARIABLES (Centered with the goal at X: 130) ---
-    int intBallX = 610; // Changed from 610 to center it perfectly with the net
+    int intBallX = 610; 
     int intBallY = 550;
     
     // Left/Right line moves horizontally between X: 1020 and 1260

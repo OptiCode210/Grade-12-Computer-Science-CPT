@@ -10,7 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 
 //frontend
-public class soccerMain extends JPanel implements ActionListener {
+public class soccerFront extends JPanel implements ActionListener {
     //Properties
     JFrame theFrame = new JFrame("PENALTY!");
 
@@ -338,7 +338,7 @@ public class soccerMain extends JPanel implements ActionListener {
 				strP2K = strSplit[1];
 				intP2KAgi = Integer.parseInt(strSplit[2]);
 				intP2KCvg = Integer.parseInt(strSplit[3]);
-				
+
 				strP2S = strSplit[4];
 				intP2SAcc = Integer.parseInt(strSplit[5]);
 				intP2SPwr = Integer.parseInt(strSplit[6]);
@@ -508,7 +508,7 @@ public class soccerMain extends JPanel implements ActionListener {
 	}
 
     //Constructor
-    public soccerMain(){
+    public soccerFront(){
         //Start window
         super();
 		theFrame.setLayout(null);
@@ -756,6 +756,6 @@ public class soccerMain extends JPanel implements ActionListener {
 
     //Main method
 	public static void main(String[] args){			
-		new soccerMain();
+		new soccerFront();
 	}
 }

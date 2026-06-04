@@ -5,7 +5,7 @@ import javax.swing.event.*;
 
 //For Paint Compnent
 //backend
-public class soccerPenalty{
+public class soccerBack{
     //Properties
     int intBallX, intBallY;
 
@@ -13,7 +13,7 @@ public class soccerPenalty{
     //Methods
 
     //Constructor
-    public soccerPenalty(){
+    public soccerBack(){
         super();
 
         intBallX = 550;

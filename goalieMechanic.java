@@ -17,6 +17,9 @@ public class goalieMechanic extends JPanel implements ActionListener, KeyListene
     JFrame theFrame = new JFrame("Trial Goalie Mechanic");
     Timer theTimer = new Timer(1000 / intfps, this);
 
+    JLabel lblLeftRight = new JLabel("Left / Right");
+    JLabel lblUpDown = new JLabel("Up / Down");
+
     BufferedImage imgBG = null;
     BufferedImage imgGoal = null;
     BufferedImage imgGoalie = null;
@@ -219,6 +222,21 @@ public class goalieMechanic extends JPanel implements ActionListener, KeyListene
         this.setPreferredSize(new Dimension(1280, 720));
         this.setFocusable(true);
         this.addKeyListener(this);
+
+        Font labelFont = new Font("Arial Black", Font.PLAIN, 18);
+        int labelWidth = 200;
+        int labelHeight = 30;
+
+        lblLeftRight.setBounds(1020, 105, labelWidth, labelHeight);
+        lblLeftRight.setForeground(Color.WHITE);
+        lblLeftRight.setFont(labelFont);
+        this.add(lblLeftRight);
+
+        lblUpDown.setBounds(1085, 195, labelWidth, labelHeight);
+        lblUpDown.setForeground(Color.WHITE);
+        lblUpDown.setFont(labelFont);
+        this.add(lblUpDown);
+
         intAgility = keeperAgility;
         intCoverage = keeperCoverage;
 

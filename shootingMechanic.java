@@ -57,7 +57,7 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
     BufferedImage imgBall = null;
     
     // --- NEW SHOOTING ANIMATION VARIABLES ---
-    boolean isShooting = false;
+    public static boolean isShooting = false;
     double dblBallX = 610.0; 
     double dblBallY = 550.0;
     double dblTargetX = 0.0;
@@ -268,7 +268,7 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
         }
     }
 
-    public void animateBall() {
+    public boolean animateBall() {
         intShotFrame++;
         
         double progress = (double) intShotFrame / intShotTotalFrames;
@@ -290,7 +290,10 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
             intBallX = (int) Math.round(dblTargetX);
             intBallY = (int) Math.round(dblTargetY);
             System.out.println("Shot finished at net!");
-        }
+            return true;
+        }else{
+			return false;
+		}
     }
 
     // Constructor

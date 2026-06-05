@@ -2,18 +2,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 
-//connect
+//connection
 public class SoccerController implements ActionListener {
+    //properties
     private SoccerModel model;
     private SoccerView view;
 
-    public SoccerController(SoccerModel model, SoccerView view) {
-        this.model = model;
-        this.view = view;
-        attachListeners();
-        updateButtonLabels();
-    }
-
+    //methods
     private void attachListeners() {
         view.playButton.addActionListener(this);
         view.helpButton.addActionListener(this);
@@ -42,17 +37,18 @@ public class SoccerController implements ActionListener {
     }
 
     public void selectStriker(int intIndex) {
+        //loads striker from the index
         model.strikerName = model.strikers[intIndex][0];
         model.strikerAccuracy = Integer.parseInt(model.strikers[intIndex][1]);
         model.strikerPower = Integer.parseInt(model.strikers[intIndex][2]);
 
-        if (model.intPicking == 1) {
-            model.strP1S = model.strikerName;
-            model.intP1SAcc = model.strikerAccuracy;
-            model.intP1SPwr = model.strikerPower;
+        if (model.intPicking == 1) {    //player 1
+            model.strP1S = model.strikerName;   //striker name
+            model.intP1SAcc = model.strikerAccuracy;    //striker accuracy
+            model.intP1SPwr = model.strikerPower;   //striker power
             model.blnP1S = true;
             view.pickedSP1Label.setText("Striker: " + model.strikerName);
-        } else if (model.intPicking == 2) {
+        } else if (model.intPicking == 2) { //player 2
             model.strP2S = model.strikerName;
             model.intP2SAcc = model.strikerAccuracy;
             model.intP2SPwr = model.strikerPower;
@@ -64,23 +60,25 @@ public class SoccerController implements ActionListener {
         System.out.println("Accuracy: " + model.strikerAccuracy);
         System.out.println("Power: " + model.strikerPower);
 
-        if (model.connectSSM != null) {
-            model.connectSSM.sendText("LIVE,S," + model.strikerName);
+        //checks if selection works
+        if (model.connectSSM != null) { 
+            model.connectSSM.sendText("LIVE,Striker," + model.strikerName);
         }
     }
 
     public void selectKeeper(int intIndex) {
+        //loads keeper variables
         model.keeperName = model.keepers[intIndex][0];
         model.keeperAgility = Integer.parseInt(model.keepers[intIndex][1]);
         model.keeperCoverage = Integer.parseInt(model.keepers[intIndex][2]);
 
-        if (model.intPicking == 1) {
+        if (model.intPicking == 1) {    //player 1
             model.strP1K = model.keeperName;
             model.intP1KAgi = model.keeperAgility;
             model.intP1KCvg = model.keeperCoverage;
             model.blnP1K = true;
             view.pickedKP1Label.setText("Keeper: " + model.keeperName);
-        } else if (model.intPicking == 2) {
+        } else if (model.intPicking == 2) { //player 2
             model.strP2K = model.keeperName;
             model.intP2KAgi = model.keeperAgility;
             model.intP2KCvg = model.keeperCoverage;
@@ -92,19 +90,19 @@ public class SoccerController implements ActionListener {
         System.out.println("Agility: " + model.keeperAgility);
         System.out.println("Coverage: " + model.keeperCoverage);
 
+        //checks if selection works
         if (model.connectSSM != null) {
-            model.connectSSM.sendText("LIVE,K," + model.keeperName);
+            model.connectSSM.sendText("LIVE,Keeper," + model.keeperName);
         }
     }
 
-    @Override
     public void actionPerformed(ActionEvent evt) {
-        if (evt.getSource() == view.playButton) {
+        if (evt.getSource() == view.playButton) {   //play button
             view.setMainVisible(false);
             view.setConnectVisible(true);
         }
 
-        if (evt.getSource() == view.connectBackButton) {
+        if (evt.getSource() == view.connectBackButton) {    //join button
             view.setConnectVisible(false);
             view.setHelpVisible(false);
             view.setSelectionVisible(false);
@@ -114,7 +112,7 @@ public class SoccerController implements ActionListener {
             view.IPLabel.setText("IP: ");
         }
 
-        if (evt.getSource() == view.serverButton) {
+        if (evt.getSource() == view.serverButton) {     //host button
             model.connectSSM = new SuperSocketMaster(6112, this);
             model.strIP = model.connectSSM.getMyAddress();
             System.out.println(model.strIP);
@@ -124,19 +122,21 @@ public class SoccerController implements ActionListener {
             System.out.println("Waiting for connection");
         }
 
-        if (evt.getSource() == view.clientButton) {
+        if (evt.getSource() == view.clientButton) {     //connect button (Joptionpane)
             model.strServerID = JOptionPane.showInputDialog(view.theFrame, "Enter IP: ", "Connect", JOptionPane.PLAIN_MESSAGE);
 
             if (model.strServerID == null || model.strServerID.equals("")) {
-                JOptionPane.showMessageDialog(view.theFrame, "Please enter an IP address.");
+                //if no IP address is provided
+                JOptionPane.showMessageDialog(view.theFrame, "Please enter an IP address.");    
             } else {
+                //if IP address is provided
                 System.out.println("Entered IP: " + model.strServerID);
                 model.connectSSM = new SuperSocketMaster(model.strServerID, 6112, this);
 
-                if (model.connectSSM.connect()) {
+                if (model.connectSSM.connect()) {   //connection successful
                     System.out.println("CONNECTED");
                     model.connectSSM.sendText("Joined");
-                } else {
+                } else {    //connection failed
                     model.blnConnected = false;
                     model.connectSSM = null;
                     JOptionPane.showMessageDialog(view.theFrame, "Could not connect. Try the IP again.");
@@ -146,6 +146,7 @@ public class SoccerController implements ActionListener {
 
         // Network Data Interception
         if (model.connectSSM != null && evt.getSource() == model.connectSSM) {
+            //if network is connected
             model.strNetText = model.connectSSM.readText();
             System.out.println("Recieved: " + model.strNetText);
 
@@ -213,8 +214,8 @@ public class SoccerController implements ActionListener {
 
         // Confirmation lock-in
         if (evt.getSource() == view.confPickButton) {
-            boolean blnReady = (model.intPicking == 1 && model.blnP1K && model.blnP1S) || 
-                              (model.intPicking == 2 && model.blnP2K && model.blnP2S);
+
+            boolean blnReady = (model.intPicking == 1 && model.blnP1K && model.blnP1S) || (model.intPicking == 2 && model.blnP2K && model.blnP2S);
 
             if (blnReady) {
                 String strMessage;
@@ -259,10 +260,18 @@ public class SoccerController implements ActionListener {
         }
     }
 
-    // Main running entrance application thread
+    //constructor
+    public SoccerController(SoccerModel model, SoccerView view) {
+        this.model = model;
+        this.view = view;
+        attachListeners();
+        updateButtonLabels();
+    }
+
+    //main method
     public static void main(String[] args) {
         SoccerModel model = new SoccerModel();
         SoccerView view = new SoccerView(model);
-        new SoccerController(model, view);
+        new SoccerController(model, view);  //implements the frontend and backend
     }
 }

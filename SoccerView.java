@@ -5,19 +5,20 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-//frontend
-public class SoccerView extends JPanel {    
-    // Window foundations
+// Frontend view for the soccer game (Jcomponents)
+public class SoccerView extends JPanel {  
+    //properties  
+    // Window variables
     public JFrame theFrame = new JFrame("PENALTY!");
     public JPanel thePanel;
 
-    // Main menu components
+    // Main menu variables
     public JButton helpButton = new JButton("Help");
     public JButton playButton = new JButton("Play");
     public JLabel titleLabel = new JLabel("Penalty Shootout");
     public JComponent[] mainMenu;
 
-    // Help menu components
+    // Help menu variables
     public JLabel helpTitleLabel = new JLabel("How to Play");
     public JLabel helpLabel = new JLabel("<html> Striker: <br>"+
         "There are 3 sliders seen on the right side of the screen. <br>"+
@@ -37,7 +38,7 @@ public class SoccerView extends JPanel {
     public JButton backButton = new JButton("Back");
     public JComponent[] helpMenu;
 
-    // Connection menu components
+    // Connection menu variables
     public JLabel serverLabel = new JLabel("Server");
     public JLabel clientLabel = new JLabel("Client");
     public JLabel connectTitleLabel = new JLabel("Connect");
@@ -49,7 +50,7 @@ public class SoccerView extends JPanel {
     public JButton connectBackButton = new JButton("Back");
     public JComponent[] connectMenu;
 
-    // Player selection components
+    // Player selection variables
     public JButton K1Button = new JButton("Gianluigi DONNARUMA");
     public JButton K2Button = new JButton("James TRAFFORD");
     public JButton K3Button = new JButton("David DE GEA");
@@ -71,7 +72,7 @@ public class SoccerView extends JPanel {
     public JLabel SAccLabel = new JLabel("");
     public JComponent[] selectionMenu;
 
-    // Visual Art Assets
+    //Images
     public BufferedImage S1Front, S1Run, S1Shoot, S1Stand, S1Card;
     public BufferedImage S2Front, S2Run, S2Shoot, S2Stand, S2Card;
     public BufferedImage S3Front, S3Run, S3Shoot, S3Stand, S3Card;
@@ -80,51 +81,14 @@ public class SoccerView extends JPanel {
     public BufferedImage K3Left, K3Right, K3Stand, K3Card;
     public BufferedImage menuBG;
 
-    // Controller validation reference
+    //Takes the properties from the Soccer model class
     private SoccerModel model;
 
-    public SoccerView(SoccerModel model) {
-        super();
-        this.model = model;
-        
-        theFrame.setLayout(null);
-        theFrame.setPreferredSize(new Dimension(1280, 720));
+    
 
-        // Setup custom panel layout and rendering rules
-        thePanel = new JPanel() {
-            @Override
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                if (menuBG != null) {
-                    g.drawImage(menuBG, 0, 0, 1280, 720, null);
-                }
-
-                if (SoccerView.this.model.blnConnected) {
-                    if (S1Card != null) g.drawImage(S1Card, 24, 100, 190, 240, null);
-                    if (S2Card != null) g.drawImage(S2Card, 224, 100, 190, 240, null);
-                    if (S3Card != null) g.drawImage(S3Card, 424, 100, 190, 240, null);
-                    if (K1Card != null) g.drawImage(K1Card, 656, 100, 190, 240, null);
-                    if (K2Card != null) g.drawImage(K2Card, 856, 100, 190, 240, null);
-                    if (K3Card != null) g.drawImage(K3Card, 1056, 100, 190, 240, null);
-                }
-            }
-        };
-        thePanel.setLayout(null);
-        thePanel.setPreferredSize(new Dimension(1280, 720));
-
-        loadArtAssets();
-        initializePositions();
-
-        // Finish layout attachment
-        theFrame.setContentPane(thePanel);
-        theFrame.setSize(1280, 720);
-        theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        theFrame.pack();
-        theFrame.setResizable(false);
-        theFrame.setVisible(true);
-    }
-
+    //methods
     private void loadArtAssets() {
+        //load images
         try {
             S1Front = ImageIO.read(new File("Images/Strikers/S1Front.gif"));
             S1Run   = ImageIO.read(new File("Images/Strikers/S1Run.gif"));
@@ -166,7 +130,10 @@ public class SoccerView extends JPanel {
     }
 
     private void initializePositions() {
-        // Main Menu
+        //creates the starting menu
+
+        // Main menu setup.
+        // These components are visible when the program first opens.
         playButton.setSize(300, 70);
         playButton.setLocation(490, 260);
         playButton.setFont(new Font("Arial", Font.BOLD, 28));
@@ -196,7 +163,7 @@ public class SoccerView extends JPanel {
 
         mainMenu = new JComponent[]{playButton, helpButton, titleLabel};
 
-        // Connect Menu
+        // Connect menu setup
         connectTitleLabel.setSize(1280, 80);
         connectTitleLabel.setLocation(0, 110);
         connectTitleLabel.setFont(new Font("Arial", Font.BOLD, 64));
@@ -243,7 +210,7 @@ public class SoccerView extends JPanel {
 
         connectMenu = new JComponent[]{serverButton, clientButton, IPLabel, connectTitleLabel, connectBackButton};
 
-        // Help Menu
+        // Help menu setup
         helpTitleLabel.setSize(1280, 80);
         helpTitleLabel.setLocation(0, 120);
         helpTitleLabel.setFont(new Font("Arial", Font.BOLD, 64));
@@ -269,7 +236,7 @@ public class SoccerView extends JPanel {
 
         helpMenu = new JComponent[]{helpTitleLabel, helpLabel, backButton};
 
-        // Selection Menu Components Layout Setup
+        // Selection menu setup
         S1Button.setSize(190, 25); S1Button.setLocation(24, 400); thePanel.add(S1Button);
         S2Button.setSize(190, 25); S2Button.setLocation(224, 400); thePanel.add(S2Button);
         S3Button.setSize(190, 25); S3Button.setLocation(424, 400); thePanel.add(S3Button);
@@ -306,15 +273,87 @@ public class SoccerView extends JPanel {
             confPickButton, pickedKP1Label, pickedSP1Label, pickedKP2Label, pickedSP2Label
         };
 
-        // Reset visibility to initial state
+        //Set all the booleans to true 
         setMainVisible(true);
         setConnectVisible(false);
         setSelectionVisible(false);
         setHelpVisible(false);
     }
 
-    public void setMainVisible(boolean b) { for(JComponent c: mainMenu) c.setVisible(b); }
-    public void setConnectVisible(boolean b) { for(JComponent c: connectMenu) c.setVisible(b); }
-    public void setSelectionVisible(boolean b) { for(JComponent c: selectionMenu) c.setVisible(b); }
-    public void setHelpVisible(boolean b) { for(JComponent c: helpMenu) c.setVisible(b); }
+    public void setMainVisible(boolean b) { 
+        //shortcut to set main menu components visibility
+        for(JComponent c: mainMenu){
+            c.setVisible(b);
+        }
+    }
+
+    public void setConnectVisible(boolean b){
+        //shortcut to set connect menu components visibility
+        for(JComponent c: connectMenu){
+            c.setVisible(b);
+        } 
+    }
+
+    public void setSelectionVisible(boolean b){ 
+        //shortcut to set select menu components visibility
+        for(JComponent c: selectionMenu){
+             c.setVisible(b);
+        } 
+    }
+
+    public void setHelpVisible(boolean b){ 
+        for(JComponent c: helpMenu){
+             c.setVisible(b); 
+        }
+    }
+
+    private void setupPanel() {
+        thePanel = new JPanel(){
+            public void paintComponent(Graphics g) {
+                super.paintComponent(g);
+
+                // Draw the menu background first so buttons and labels appear on top
+                if (menuBG != null) {
+                    g.drawImage(menuBG, 0, 0, 1280, 720, null);
+                }
+
+                // Once the players are connected, draw the available player cards
+                if (SoccerView.this.model.blnConnected) {
+                    if (S1Card != null) g.drawImage(S1Card, 24, 100, 190, 240, null);
+                    if (S2Card != null) g.drawImage(S2Card, 224, 100, 190, 240, null);
+                    if (S3Card != null) g.drawImage(S3Card, 424, 100, 190, 240, null);
+                    if (K1Card != null) g.drawImage(K1Card, 656, 100, 190, 240, null);
+                    if (K2Card != null) g.drawImage(K2Card, 856, 100, 190, 240, null);
+                    if (K3Card != null) g.drawImage(K3Card, 1056, 100, 190, 240, null);
+                }
+            }
+        };
+    }
+
+    // Constructor
+    public SoccerView(SoccerModel model) {
+        super();
+        this.model = model;
+
+        //graphics
+        setupPanel();
+        
+        //Start window
+        theFrame.setLayout(null);
+        theFrame.setPreferredSize(new Dimension(1280, 720));
+            
+        thePanel.setLayout(null);
+        thePanel.setPreferredSize(new Dimension(1280, 720));
+
+        loadArtAssets();
+        initializePositions();
+
+        //Finish window
+        theFrame.setContentPane(thePanel);
+        theFrame.setSize(1280, 720);
+        theFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        theFrame.pack();
+        theFrame.setResizable(false);
+        theFrame.setVisible(true);
+    }
 }

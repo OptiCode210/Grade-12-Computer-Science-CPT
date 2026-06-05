@@ -240,7 +240,7 @@ public class shootingMechanic extends JPanel implements ActionListener, KeyListe
 
                 // Target the open net area inside the goal image.
                 int goalLeft = 315;
-                int goalRight = 800;
+                int goalRight = 940;
                 int goalTop = 330;
                 int goalBottom = 450;
 

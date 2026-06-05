@@ -2,6 +2,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JOptionPane;
 
+//connect
 public class SoccerController implements ActionListener {
     private SoccerModel model;
     private SoccerView view;

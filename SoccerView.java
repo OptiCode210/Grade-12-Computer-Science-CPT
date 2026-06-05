@@ -5,7 +5,8 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
-public class SoccerView extends JPanel {
+//frontend
+public class SoccerView extends JPanel {    
     // Window foundations
     public JFrame theFrame = new JFrame("PENALTY!");
     public JPanel thePanel;

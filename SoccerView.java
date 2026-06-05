@@ -64,6 +64,7 @@ public class SoccerView extends JPanel {
     public JLabel pickedKP2Label = new JLabel("Keeper: ");
     public JLabel pickedSP2Label = new JLabel("Striker: ");
 
+
     public JLabel pickLabel = new JLabel("");
     public JLabel playerLabel = new JLabel("");
     public JLabel KAgiLabel = new JLabel("");

@@ -102,6 +102,7 @@ public class animation{
 				g.drawImage(imgGoal, 130, 160, theFrame);
 			}
 			
+			//Drawing stationary objects
 			// Draw keeper centered standing directly in front of the goal line
 			if (imgGoalie != null) {
 				g.drawImage(imgGoalie, 450, 340, theFrame);
@@ -114,7 +115,27 @@ public class animation{
 			
 			// Draw striker placed to the left or offset right behind the ball
 			if(imgStriker != null){
-				g.drawImage(imgStriker, 480, 410, theFrame);
+				g.drawImage(imgStriker, 380, 440, theFrame);
+			}
+			
+			//Drawing the shot
+			if(shootingMechanic.isShooting == true){
+				if(imgStriker != null && imgGoal != null){
+					try {
+						g.drawImage(imgBG, 0, 0, 1280, 720, null);
+						g.drawImage(imgGoal, 130, 160, theFrame);
+						g.drawImage(imgBall, intBallX, intBallY, theFrame);
+						
+						setStrikerFileValue();
+						imgGoalie = ImageIO.read(new File("images/keepers/K" + keeperFileValue + "Left.png"));
+						imgStriker = ImageIO.read(new File("images/Strikers/S" + strikerFileValue + "Shoot.gif"));
+												
+						g.drawImage(imgGoalie, 350, 340, theFrame);		
+						g.drawImage(imgStriker, 530, 440, theFrame);			
+					} catch (IOException e) {
+						System.out.println("striker image error");
+					}			
+				}
 			}
 		}
 	};

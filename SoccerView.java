@@ -397,45 +397,57 @@ public class SoccerView extends JPanel {
 		Graphics2D g2 = (Graphics2D) g;
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-		// Determine who is currently active based on the game phase
-		// Phase 1 = P1 shoots, Phase 2 = P1 shoots (P2 saves), Phase 3 = P2 shoots, Phase 4 = P2 shoots (P1 saves)
+		// Track who is shooting based on the game phase
 		boolean isP1Active = (model.intGamePhase == 1 || model.intGamePhase == 2);
 
-		// Dynamic heights based on who is active
-		int p1Height = isP1Active ? 46 : 30;
-		int p2Height = !isP1Active ? 46 : 30;
-		
-		// Vertical placement logic to stack cleanly
+		int rowHeight = 39;
 		int p1Y = 40;
-		int p2Y = p1Y + p1Height + 2; // 2-pixel gap between rows
-		int totalHeight = p1Height + p2Height + 2;
+		int p2Y = 81;
 
-		// 1. Background Bar (Matches the total dynamic height)
+		// 1. Background Bar (Fixed size)
 		g2.setColor(new Color(20, 20, 25, 200));
-		g2.fillRect(40, p1Y, 220, totalHeight);
+		g2.fillRect(40, 40, 260, 80);
 
-		// 2. Player 1 Row
+		// 2. Team Name Blocks (The neon green accent)
 		g2.setColor(new Color(180, 255, 50)); 
-		g2.fillRect(40, p1Y, 100, p1Height); // P1 Accent Block
-		
-		g2.setFont(new Font("Arial", Font.BOLD, isP1Active ? 24 : 16));
-		g2.setColor(Color.BLACK);
-		// Center text vertically in the dynamic block
-		g2.drawString("P1", 75, p1Y + (p1Height / 2) + (isP1Active ? 8 : 6)); 
-		g2.setColor(Color.WHITE);
-		g2.drawString("" + model.intP1Score, 185, p1Y + (p1Height / 2) + (isP1Active ? 8 : 6));
+		g2.fillRect(40, p1Y, 100, rowHeight); // Player 1 block
+		g2.fillRect(40, p2Y, 100, rowHeight); // Player 2 block
 
-		// 3. Player 2 Row
-		g2.setColor(new Color(180, 255, 50)); 
-		g2.fillRect(40, p2Y, 100, p2Height); // P2 Accent Block
+		// 3. Text & Score Styling (Fixed font size)
+		g2.setFont(new Font("Arial", Font.BOLD, 24));
 		
-		g2.setFont(new Font("Arial", Font.BOLD, !isP1Active ? 24 : 16));
+		// Player 1 Row Text
 		g2.setColor(Color.BLACK);
-		g2.drawString("P2", 75, p2Y + (p2Height / 2) + (!isP1Active ? 8 : 6));
+		g2.drawString("P1", 75, 69);
 		g2.setColor(Color.WHITE);
-		g2.drawString("" + model.intP2Score, 185, p2Y + (p2Height / 2) + (!isP1Active ? 8 : 6));
+		g2.drawString("" + model.intP1Score, 185, 69);
 
-		// 4. Header Label Above Scoreboard
+		// Player 2 Row Text
+		g2.setColor(Color.BLACK);
+		g2.drawString("P2", 75, 110);
+		g2.setColor(Color.WHITE);
+		g2.drawString("" + model.intP2Score, 185, 110);
+
+		// 4. Draw Indicator Arrow for the active shooter
+		g2.setColor(new Color(180, 255, 50)); // Match the neon green accent
+		
+		// Create an arrow shape pointing left
+		int[] arrowX = {245, 235, 245};
+		int[] arrowY = new int[3];
+		
+		if (isP1Active) {
+			arrowY[0] = 50;  // Top point
+			arrowY[1] = 60;  // Left point (tip)
+			arrowY[2] = 70;  // Bottom point
+		} else {
+			arrowY[0] = 91;  // Top point
+			arrowY[1] = 101; // Left point (tip)
+			arrowY[2] = 111; // Bottom point
+		}
+		
+		g2.fillPolygon(arrowX, arrowY, 3);
+
+		// 5. Header Label Above Scoreboard
 		g2.setFont(new Font("Arial", Font.PLAIN, 14));
 		g2.setColor(Color.LIGHT_GRAY);
 		g2.drawString("PENALTY SHOOTOUT", 40, 35);

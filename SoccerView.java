@@ -66,12 +66,15 @@ public class SoccerView extends JPanel {
 
 
     public JLabel pickLabel = new JLabel("");
-    public JLabel playerLabel = new JLabel("");
-    public JLabel KAgiLabel = new JLabel("");
-    public JLabel KCvgLabel = new JLabel("");
-    public JLabel SPwrLabel = new JLabel("");
-    public JLabel SAccLabel = new JLabel("");
     public JComponent[] selectionMenu;
+
+    //shooting mechanic
+    public JLabel turnLabel = new JLabel("");
+    public JLabel scoreLabel = new JLabel("");
+    public JLabel lblLeftRight = new JLabel("Left / Right");
+    public JLabel lblUpDown = new JLabel("Up / Down");
+    public JLabel lblPower = new JLabel("Power");
+    public JComponent[] gameMenu;
 
     //Images
     public BufferedImage S1Front, S1Run, S1Shoot, S1Stand, S1Card;
@@ -81,6 +84,9 @@ public class SoccerView extends JPanel {
     public BufferedImage K2Left, K2Right, K2Stand, K2Card;
     public BufferedImage K3Left, K3Right, K3Stand, K3Card;
     public BufferedImage menuBG;
+    public BufferedImage shootingBG;
+    public BufferedImage goalImg;
+    public BufferedImage ballImg;
 
     //Takes the properties from the Soccer model class
     private SoccerModel model;
@@ -123,6 +129,10 @@ public class SoccerView extends JPanel {
             K3Right = ImageIO.read(new File("Images/keepers/K3Right.png"));
             K3Stand = ImageIO.read(new File("Images/keepers/K3Stand.png"));
             K3Card  = ImageIO.read(new File("Images/player cards/K3Card.png"));
+
+            shootingBG = ImageIO.read(new File("Images/shootingBG.jpeg"));
+            goalImg = ImageIO.read(new File("Images/Goal.png"));
+            ballImg = ImageIO.read(new File("Images/ball.png"));
 
             menuBG  = ImageIO.read(new File("Images/menuBG.jpg"));
         } catch (IOException e) {
@@ -270,15 +280,52 @@ public class SoccerView extends JPanel {
 
         selectionMenu = new JComponent[]{
             K1Button, K2Button, K3Button, S1Button, S2Button, S3Button,
-            playerLabel, KAgiLabel, KCvgLabel, SPwrLabel, SAccLabel, pickLabel,
-            confPickButton, pickedKP1Label, pickedSP1Label, pickedKP2Label, pickedSP2Label
+            pickLabel, confPickButton, pickedKP1Label, pickedSP1Label,
+            pickedKP2Label, pickedSP2Label
         };
+
+        //shooting mechanic setup
+        turnLabel.setSize(500, 40);
+        turnLabel.setLocation(20, 20);
+        turnLabel.setForeground(Color.WHITE);
+        turnLabel.setFont(new Font("Arial", Font.BOLD, 28));
+        thePanel.add(turnLabel);
+
+        scoreLabel.setSize(500, 40);
+        scoreLabel.setLocation(20, 60);
+        scoreLabel.setForeground(Color.WHITE);
+        scoreLabel.setFont(new Font("Arial", Font.BOLD, 24));
+        thePanel.add(scoreLabel);
+
+        lblLeftRight.setBounds(1020, 105, 200, 30);
+        lblLeftRight.setForeground(Color.WHITE);
+        lblLeftRight.setFont(new Font("Arial Black", Font.PLAIN, 18));
+        thePanel.add(lblLeftRight);
+
+        lblUpDown.setBounds(1085, 195, 200, 30);
+        lblUpDown.setForeground(Color.WHITE);
+        lblUpDown.setFont(new Font("Arial Black", Font.PLAIN, 18));
+        thePanel.add(lblUpDown);
+
+        lblPower.setBounds(1020, 485, 200, 30);
+        lblPower.setForeground(Color.WHITE);
+        lblPower.setFont(new Font("Arial Black", Font.PLAIN, 18));
+        thePanel.add(lblPower);
+
+        gameMenu = new JComponent[]{turnLabel, scoreLabel, lblLeftRight, lblUpDown, lblPower};
+        setGameVisible(false);
 
         //Set all the booleans to true 
         setMainVisible(true);
         setConnectVisible(false);
         setSelectionVisible(false);
         setHelpVisible(false);
+    }
+
+    public void setGameVisible(boolean b){
+        for (JComponent c : gameMenu) {
+            c.setVisible(b);
+        }
     }
 
     public void setMainVisible(boolean b) { 
@@ -318,6 +365,11 @@ public class SoccerView extends JPanel {
                     g.drawImage(menuBG, 0, 0, 1280, 720, null);
                 }
 
+                if (SoccerView.this.model.intGamePhase > 0) {
+                    drawShootingGame(g);
+                    return;
+                }
+
                 // Once the players are connected, draw the available player cards
                 if (SoccerView.this.model.blnConnected) {
                     if (S1Card != null) g.drawImage(S1Card, 24, 100, 190, 240, null);
@@ -329,6 +381,77 @@ public class SoccerView extends JPanel {
                 }
             }
         };
+    }
+
+    public void drawShootingGame(Graphics g){
+            if (shootingBG != null) g.drawImage(shootingBG, 0, 0, 1280, 720, null);
+            if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
+            if (ballImg != null) g.drawImage(ballImg, model.intBallX, model.intBallY, null);
+
+            drawShotMeters(g);
+    }
+
+    public void drawShotMeters(Graphics g){
+        Color darkTrackBg = new Color(30, 30, 35);
+
+        // METER 1: LEFT / RIGHT
+        g.setColor(Color.BLACK);
+        g.fillRect(1016, 136, 248, 48);
+        g.setColor(darkTrackBg);
+        g.fillRect(1020, 140, 240, 40);
+        g.setColor(new Color(0, 180, 216));
+        g.fillRect(1020, 140, 240, 4);
+        g.fillRect(1020, 176, 240, 4);
+        g.fillRect(1020, 140, 4, 40);
+        g.fillRect(1256, 140, 4, 40);
+        g.setColor(Color.WHITE);
+        g.fillRect(model.intLeftRightLineX - 2, 140, 4, 40);
+
+        // METER 2: UP / DOWN
+        g.setColor(Color.BLACK);
+        g.fillRect(1116, 226, 48, 248);
+        g.setColor(darkTrackBg);
+        g.fillRect(1120, 230, 40, 240);
+        g.setColor(new Color(247, 127, 0));
+        g.fillRect(1120, 230, 40, 4);
+        g.fillRect(1120, 466, 40, 4);
+        g.fillRect(1120, 230, 4, 240);
+        g.fillRect(1156, 230, 4, 240);
+        g.setColor(Color.WHITE);
+        g.fillRect(1120, model.intUpDownLineY - 2, 40, 4);
+
+        // METER 3: POWER
+        int intPowerX = 1020;
+        int intPowerY = 520;
+        int intPowerWidth = 240;
+        int intPowerHeight = 40;
+
+        g.setColor(Color.BLACK);
+        g.fillRect(intPowerX - 4, intPowerY - 4, intPowerWidth + 8, intPowerHeight + 8);
+        g.setColor(darkTrackBg);
+        g.fillRect(intPowerX, intPowerY, intPowerWidth, intPowerHeight);
+
+        int intSegments = 12;
+        int intSegmentWidth = intPowerWidth / intSegments;
+
+        for (int i = 0; i < intSegments; i++) {
+            double dblProgress = (double) i / (intSegments - 1);
+            int intRed = (int) (dblProgress * 255);
+            int intGreen = (int) (255 - (dblProgress * 255));
+
+            g.setColor(new Color(intRed, intGreen, 30));
+            g.fillRect(intPowerX + (i * intSegmentWidth) + 2, intPowerY + 2, intSegmentWidth - 4, intPowerHeight - 4);
+        }
+
+        g.setColor(Color.BLACK);
+        g.fillRect(intPowerX, intPowerY, intPowerWidth, 4);
+        g.fillRect(intPowerX, intPowerY + intPowerHeight - 4, intPowerWidth, 4);
+        g.fillRect(intPowerX, intPowerY, 4, intPowerHeight);
+        g.fillRect(intPowerX + intPowerWidth - 4, intPowerY, 4, intPowerHeight);
+
+        g.setColor(Color.WHITE);
+        g.fillRect(model.intPowerLineX - 2, intPowerY, 4, intPowerHeight);
+        
     }
 
     // Constructor

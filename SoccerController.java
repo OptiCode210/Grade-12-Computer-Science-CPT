@@ -1,12 +1,24 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.JOptionPane;
+import java.awt.event.KeyListener;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import javax.imageio.*;
+import java.io.File;
 
 //connection
-public class SoccerController implements ActionListener {
+public class SoccerController implements ActionListener, KeyListener {
     //properties
     private SoccerModel model;
     private SoccerView view;
+
+    int fps = 60;
+    private Timer theTimer = new Timer(1000 / fps, this);
+
 
     //methods
     private void attachListeners() {
@@ -54,7 +66,9 @@ public class SoccerController implements ActionListener {
         if (model.blnSentPicks && model.blnReceivedPicks) {
             view.pickLabel.setText("Both locked in!");
             System.out.println("----------------------------------------");
-            System.out.println("Both ready! Proceed to comparison gameplay logic.");
+
+            startGameplay();    //starts main game
+
         } else if (model.blnSentPicks) {
             view.pickLabel.setText("Waiting for other player...");
         }
@@ -241,7 +255,7 @@ public class SoccerController implements ActionListener {
             }
         }
 
-        if (model.blnConnected && !view.K1Button.isVisible() && !view.confPickButton.isVisible()) {
+        if (model.intGamePhase == 0 && model.blnConnected && !view.K1Button.isVisible() && !view.confPickButton.isVisible()) {
             view.setMainVisible(false);
             view.setConnectVisible(false);
             view.setSelectionVisible(true);
@@ -296,10 +310,58 @@ public class SoccerController implements ActionListener {
         }
     }
 
+    public void startGameplay(){
+        model.intGamePhase = 1;
+        model.resetShot();
+
+        view.setMainVisible(false);
+        view.setConnectVisible(false);
+        view.setHelpVisible(false);
+        view.setSelectionVisible(false);
+        view.setGameVisible(true);
+        view.pickLabel.setVisible(false);
+        view.turnLabel.setText("Player 1 Shoot");
+        view.scoreLabel.setText("P1: " + model.intP1Score + " | P2: " + model.intP2Score);
+
+        theTimer.start();
+        view.thePanel.revalidate();
+        view.thePanel.repaint();
+        view.thePanel.requestFocusInWindow();
+    }
+
+    public void keyReleased(KeyEvent evt) {
+        if (evt.getKeyCode() == KeyEvent.VK_SPACE && model.intGamePhase > 0) {
+            if (model.intShotStage == 1) {
+                model.dblFinalLeftRightPercent = ((double)(model.intLeftRightLineX - 1020) / 240.0) * 100.0;
+                model.intShotStage = 2;
+            } else if (model.intShotStage == 2) {
+                model.dblFinalUpDownPercent = ((double)(model.intUpDownLineY - 230) / 240.0) * 100.0;
+                model.intShotStage = 3;
+            } else if (model.intShotStage == 3) {
+                model.dblFinalPowerPercent = ((double)(model.intPowerLineX - 1020) / 240.0) * 100.0;
+                model.blnShooting = true;
+                model.intShotStage = 4;
+
+                System.out.println("Shot locked:");
+                System.out.println("Left/Right: " + model.dblFinalLeftRightPercent);
+                System.out.println("Up/Down: " + model.dblFinalUpDownPercent);
+                System.out.println("Power: " + model.dblFinalPowerPercent);
+            }
+        }
+    }
+
+    public void keyPressed(KeyEvent evt) {
+    }
+
+    public void keyTyped(KeyEvent evt) {
+    }
+
     //constructor
     public SoccerController(SoccerModel model, SoccerView view) {
         this.model = model;
         this.view = view;
+        view.thePanel.setFocusable(true);
+        view.thePanel.addKeyListener(this);
         attachListeners();
         updateButtonLabels();
     }

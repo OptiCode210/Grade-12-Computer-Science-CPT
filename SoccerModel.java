@@ -51,11 +51,44 @@ public class SoccerModel {
     
     public int intPicking = 1;
 
+    //gameplay variables
+    /* 0 = picking, 1 = P1 shoot, 2 = P2 Save, 3 = P2 shoots, 4 = P1 saves */
+    int intGamePhase = 0;   
+    int intP1Score = 0;
+    public int intP2Score = 0;
+    int intWinningScore = 5;
+
+    //shooting mechanic variables
+    public int intShotStage = 1;
+    public int intBallX = 610;
+    public int intBallY = 550;
+
+    public int intLeftRightLineX = 1140;
+    public int intUpDownLineY = 350;
+    public int intPowerLineX = 1140;
+
+    public int intLeftRightSpeed = 4;
+    public int intUpDownSpeed = 5;
+    public int intPowerSpeed = 6;
+
+    public double dblFinalLeftRightPercent = 0.0;
+    public double dblFinalUpDownPercent = 0.0;
+    public double dblFinalPowerPercent = 0.0;
+
+    public boolean blnShooting = false;
+
+
+
     //Completed boolean values
     public boolean blnP1S = false;
     public boolean blnP1K = false;
     public boolean blnP2S = false;
     public boolean blnP2K = false;
+
+
+
+    //shooting mechanic variables
+
 
     //methods
     //Loads striker and keeper data from two CSV files.
@@ -94,6 +127,42 @@ public class SoccerModel {
 
         } catch (IOException e) {
             System.out.println("File error");
+        }
+    }
+
+    public void resetShot(){
+        System.out.println("Resetting shot");
+
+        intShotStage = 1;
+        intBallX = 610;
+        intBallY = 550;
+
+        intLeftRightLineX = 1140;
+        intUpDownLineY = 350;
+        intPowerLineX = 1140;
+
+        blnShooting = false;
+    }
+
+    public void moveShotSliders() {
+        if (intShotStage == 1) {
+            intLeftRightLineX += intLeftRightSpeed;
+
+            if (intLeftRightLineX <= 1020 || intLeftRightLineX >= 1260) {
+                intLeftRightSpeed = -intLeftRightSpeed;
+            }
+        } else if (intShotStage == 2) {
+            intUpDownLineY += intUpDownSpeed;
+
+            if (intUpDownLineY <= 230 || intUpDownLineY >= 470) {
+                intUpDownSpeed = -intUpDownSpeed;
+            }
+        } else if (intShotStage == 3) {
+            intPowerLineX += intPowerSpeed;
+
+            if (intPowerLineX <= 1020 || intPowerLineX >= 1260) {
+                intPowerSpeed = -intPowerSpeed;
+            }
         }
     }
 

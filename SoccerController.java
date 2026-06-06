@@ -310,24 +310,27 @@ public class SoccerController implements ActionListener, KeyListener {
         }
     }
 
-    public void startGameplay(){
-        model.intGamePhase = 1;
-        model.resetShot();
+	public void startGameplay() {
+		model.intGamePhase = 1;
+		model.resetShot();
 
-        view.setMainVisible(false);
-        view.setConnectVisible(false);
-        view.setHelpVisible(false);
-        view.setSelectionVisible(false);
-        view.setGameVisible(true);
-        view.pickLabel.setVisible(false);
-        view.turnLabel.setText("Player 1 Shoot");
-        view.scoreLabel.setText("P1: " + model.intP1Score + " | P2: " + model.intP2Score);
+		view.setMainVisible(false);
+		view.setConnectVisible(false);
+		view.setHelpVisible(false);
+		view.setSelectionVisible(false);
+		view.setGameVisible(true);
+		view.pickLabel.setVisible(false);
+		
+		// Completely hide both old label text layers
+		view.scoreLabel.setVisible(false); 
+		view.turnLabel.setVisible(false); 
+		
+		theTimer.start();
+		view.thePanel.revalidate();
+		view.thePanel.repaint();
+		view.thePanel.requestFocusInWindow();
+	}
 
-        theTimer.start();
-        view.thePanel.revalidate();
-        view.thePanel.repaint();
-        view.thePanel.requestFocusInWindow();
-    }
 
     public void keyReleased(KeyEvent evt) {
         if (evt.getKeyCode() == KeyEvent.VK_SPACE && model.intGamePhase > 0) {

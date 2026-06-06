@@ -383,13 +383,63 @@ public class SoccerView extends JPanel {
         };
     }
 
-    public void drawShootingGame(Graphics g){
-            if (shootingBG != null) g.drawImage(shootingBG, 0, 0, 1280, 720, null);
-            if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
-            if (ballImg != null) g.drawImage(ballImg, model.intBallX, model.intBallY, null);
+	public void drawShootingGame(Graphics g) {
+		if (shootingBG != null) g.drawImage(shootingBG, 0, 0, 1280, 720, null);
+		if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
+		if (ballImg != null) g.drawImage(ballImg, model.intBallX, model.intBallY, null);
 
-            drawShotMeters(g);
-    }
+		// New stylized scoreboard drawing
+		drawProfessionalScoreboard(g);
+		drawShotMeters(g);
+	}
+
+	private void drawProfessionalScoreboard(Graphics g) {
+		Graphics2D g2 = (Graphics2D) g;
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+		// Determine who is currently active based on the game phase
+		// Phase 1 = P1 shoots, Phase 2 = P1 shoots (P2 saves), Phase 3 = P2 shoots, Phase 4 = P2 shoots (P1 saves)
+		boolean isP1Active = (model.intGamePhase == 1 || model.intGamePhase == 2);
+
+		// Dynamic heights based on who is active
+		int p1Height = isP1Active ? 46 : 30;
+		int p2Height = !isP1Active ? 46 : 30;
+		
+		// Vertical placement logic to stack cleanly
+		int p1Y = 40;
+		int p2Y = p1Y + p1Height + 2; // 2-pixel gap between rows
+		int totalHeight = p1Height + p2Height + 2;
+
+		// 1. Background Bar (Matches the total dynamic height)
+		g2.setColor(new Color(20, 20, 25, 200));
+		g2.fillRect(40, p1Y, 220, totalHeight);
+
+		// 2. Player 1 Row
+		g2.setColor(new Color(180, 255, 50)); 
+		g2.fillRect(40, p1Y, 100, p1Height); // P1 Accent Block
+		
+		g2.setFont(new Font("Arial", Font.BOLD, isP1Active ? 24 : 16));
+		g2.setColor(Color.BLACK);
+		// Center text vertically in the dynamic block
+		g2.drawString("P1", 75, p1Y + (p1Height / 2) + (isP1Active ? 8 : 6)); 
+		g2.setColor(Color.WHITE);
+		g2.drawString("" + model.intP1Score, 185, p1Y + (p1Height / 2) + (isP1Active ? 8 : 6));
+
+		// 3. Player 2 Row
+		g2.setColor(new Color(180, 255, 50)); 
+		g2.fillRect(40, p2Y, 100, p2Height); // P2 Accent Block
+		
+		g2.setFont(new Font("Arial", Font.BOLD, !isP1Active ? 24 : 16));
+		g2.setColor(Color.BLACK);
+		g2.drawString("P2", 75, p2Y + (p2Height / 2) + (!isP1Active ? 8 : 6));
+		g2.setColor(Color.WHITE);
+		g2.drawString("" + model.intP2Score, 185, p2Y + (p2Height / 2) + (!isP1Active ? 8 : 6));
+
+		// 4. Header Label Above Scoreboard
+		g2.setFont(new Font("Arial", Font.PLAIN, 14));
+		g2.setColor(Color.LIGHT_GRAY);
+		g2.drawString("PENALTY SHOOTOUT", 40, 35);
+	}
 
     public void drawShotMeters(Graphics g){
         Color darkTrackBg = new Color(30, 30, 35);

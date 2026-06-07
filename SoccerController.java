@@ -308,6 +308,28 @@ public class SoccerController implements ActionListener, KeyListener {
             view.setMainVisible(true);
             view.thePanel.repaint();
         }
+        
+        //Chat features
+        if (evt.getSource() == view.chatField) {
+			// Send chat text across network if connection exists
+			if (model.connectSSM != null) {
+				model.connectSSM.sendText("Chat:" + view.chatField.getText());
+				// Append your own text locally so you can see it
+				view.chatArea.append("You: " + view.chatField.getText() + "\n");
+				view.chatField.setText("");
+			}
+			
+		} else if (model.connectSSM != null && evt.getSource() == model.connectSSM) {
+			String strLine = model.connectSSM.readText();
+			
+			// Check if the incoming string packet is a chat message
+			if (strLine.startsWith("Chat:")) {
+				String cleanMsg = strLine.substring(5); // Remove "Chat:" prefix
+				view.chatArea.append("Opponent: " + cleanMsg + "\n");
+			} else {
+				// ... your existing game data transmission parsing logic goes here ...
+			}
+		}
     }
 
 	public void startGameplay() {
@@ -365,6 +387,7 @@ public class SoccerController implements ActionListener, KeyListener {
         this.view = view;
         view.thePanel.setFocusable(true);
         view.thePanel.addKeyListener(this);
+        view.chatField.addActionListener(this);
         attachListeners();
         updateButtonLabels();
     }

@@ -87,6 +87,11 @@ public class SoccerView extends JPanel {
     public BufferedImage shootingBG;
     public BufferedImage goalImg;
     public BufferedImage ballImg;
+    
+    //Chat variable
+	public JTextArea chatArea = new JTextArea();
+	public JScrollPane chatScroll = new JScrollPane(chatArea);
+	public JTextField chatField = new JTextField();
 
     //Takes the properties from the Soccer model class
     private SoccerModel model;
@@ -326,6 +331,8 @@ public class SoccerView extends JPanel {
         for (JComponent c : gameMenu) {
             c.setVisible(b);
         }
+        chatScroll.setVisible(b);
+		chatField.setVisible(b);
     }
 
     public void setMainVisible(boolean b) { 
@@ -379,6 +386,22 @@ public class SoccerView extends JPanel {
                     if (K2Card != null) g.drawImage(K2Card, 856, 100, 190, 240, null);
                     if (K3Card != null) g.drawImage(K3Card, 1056, 100, 190, 240, null);
                 }
+                // Configure Chat Components
+				chatArea.setEditable(false);
+				chatArea.setLineWrap(true);
+				chatArea.setWrapStyleWord(true);
+
+				// Position chat scroll pane on the left side (X: 20, Y: 150)
+				chatScroll.setSize(220, 350);
+				chatScroll.setLocation(20, 150);
+				chatScroll.setVisible(false); // Initially hidden on menus
+				thePanel.add(chatScroll);
+
+				// Position chat text field right below the scroll pane
+				chatField.setSize(220, 40);
+				chatField.setLocation(20, 510);
+				chatField.setVisible(false); // Initially hidden on menus
+				thePanel.add(chatField);
             }
         };
     }

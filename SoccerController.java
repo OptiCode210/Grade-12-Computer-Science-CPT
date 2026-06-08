@@ -330,6 +330,20 @@ public class SoccerController implements ActionListener, KeyListener {
 				// ... your existing game data transmission parsing logic goes here ...
 			}
 		}
+		if (evt.getSource() == theTimer) {
+            if (model.intGamePhase > 0) {
+                if (!model.blnShooting) {
+                    model.moveShotSliders();
+                } else {
+                    model.animateBall();
+                }
+                view.thePanel.repaint();
+            }
+        }
+
+        if (evt.getSource() == view.playButton) {
+		}   //play button
+        // ... rest of your buttons and network code continues untouched below ...
     }
 
 	public void startGameplay() {

@@ -87,7 +87,15 @@ public class SoccerModel {
 
 
 
-    //shooting mechanic variables
+    // Target vectors for flight path
+    public double dblBallX = 610.0;
+    public double dblBallY = 550.0;
+    public double dblTargetX = 0.0;
+    public double dblTargetY = 0.0;
+    public double dblShotStartX = 610.0;
+    public double dblShotStartY = 550.0;
+    public int intShotFrame = 0;
+    public int intShotTotalFrames = 45;
 
 
     //methods
@@ -130,17 +138,15 @@ public class SoccerModel {
         }
     }
 
-    public void resetShot(){
-        System.out.println("Resetting shot");
-
+	public void resetShot(){
         intShotStage = 1;
         intBallX = 610;
         intBallY = 550;
-
+        dblBallX = 610.0;
+        dblBallY = 550.0;
         intLeftRightLineX = 1140;
         intUpDownLineY = 350;
         intPowerLineX = 1140;
-
         blnShooting = false;
     }
 
@@ -164,6 +170,57 @@ public class SoccerModel {
                 intPowerSpeed = -intPowerSpeed;
             }
         }
+    }
+
+    public void calculateTarget() {
+        // Target coordinates based on open net area inside the view frame
+        int goalLeft = 315;
+        int goalRight = 940;
+        int goalTop = 330;
+        int goalBottom = 450;
+
+        double targetCenterX = goalLeft + ((dblFinalLeftRightPercent / 100.0) * (goalRight - goalLeft));
+        double targetCenterY = goalTop + ((dblFinalUpDownPercent / 100.0) * (goalBottom - goalTop));
+        
+        // Compensate for center alignment
+        dblTargetX = targetCenterX - 15; // Roughly half of ball thickness
+        dblTargetY = targetCenterY - 15;
+
+        // Dynamic speed based on power selection
+        intShotTotalFrames = (int) (62 - (dblFinalPowerPercent * 0.40)); 
+        if (intShotTotalFrames < 18) intShotTotalFrames = 18;
+
+        dblBallX = intBallX;
+        dblBallY = intBallY;
+        dblShotStartX = dblBallX;
+        dblShotStartY = dblBallY;
+        intShotFrame = 0;
+    }
+
+    public boolean animateBall() {
+        intShotFrame++;
+        
+        double progress = (double) intShotFrame / intShotTotalFrames;
+        if (progress > 1.0) progress = 1.0;
+
+        // Clean cubic ease-out calculation for deceleration arc
+        double easedProgress = 1.0 - Math.pow(1.0 - progress, 3);
+        dblBallX = dblShotStartX + ((dblTargetX - dblShotStartX) * easedProgress);
+        dblBallY = dblShotStartY + ((dblTargetY - dblShotStartY) * easedProgress);
+        
+        intBallX = (int) Math.round(dblBallX);
+        intBallY = (int) Math.round(dblBallY);
+
+        if (progress >= 1.0) {
+            blnShooting = false;
+            intBallX = (int) Math.round(dblTargetX);
+            intBallY = (int) Math.round(dblTargetY);
+            
+            // Turn over controls / Reset back to meter phase
+            intShotStage = 1; 
+            return true;
+        }
+        return false;
     }
 
 

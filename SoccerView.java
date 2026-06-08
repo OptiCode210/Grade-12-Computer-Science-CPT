@@ -372,8 +372,15 @@ public class SoccerView extends JPanel {
                     g.drawImage(menuBG, 0, 0, 1280, 720, null);
                 }
 
-                if (SoccerView.this.model.intGamePhase > 0) {
+                if (SoccerView.this.model.shouldLocalViewShowShooting()) {
+                    // The local striker sees the shooting screen.
+                    // After shooting, this screen can remain as a waiting/result view.
                     drawShootingGame(g);
+                    return;
+                } else if (SoccerView.this.model.shouldLocalViewShowGoalie()) {
+                    // The opponent sees the goalie screen while the striker shoots.
+                    // The goalie sliders only move when the controller says it is goalie input time.
+                    drawGoalieGame(g);
                     return;
                 }
 
@@ -415,6 +422,35 @@ public class SoccerView extends JPanel {
 		drawProfessionalScoreboard(g);
 		drawShotMeters(g);
 	}
+
+    public void drawGoalieGame(Graphics g) {
+        BufferedImage keeperImage = getSavingKeeperImage();
+
+        if (shootingBG != null) g.drawImage(shootingBG, 0, 0, 1280, 720, null);
+        if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
+        if (keeperImage != null) g.drawImage(keeperImage, 450, 340, null);
+
+        drawProfessionalScoreboard(g);
+        drawGoalieMeters(g);
+    }
+
+    private BufferedImage getSavingKeeperImage() {
+        String strKeeperName;
+
+        if (model.intGamePhase == 2) {
+            strKeeperName = model.strP2K;
+        } else {
+            strKeeperName = model.strP1K;
+        }
+
+        if (strKeeperName != null && strKeeperName.equals(model.keepers[1][0])) {
+            return K2Stand;
+        } else if (strKeeperName != null && strKeeperName.equals(model.keepers[2][0])) {
+            return K3Stand;
+        }
+
+        return K1Stand;
+    }
 
 	private void drawProfessionalScoreboard(Graphics g) {
 		Graphics2D g2 = (Graphics2D) g;
@@ -537,6 +573,36 @@ public class SoccerView extends JPanel {
         g.setColor(Color.WHITE);
         g.fillRect(model.intPowerLineX - 2, intPowerY, 4, intPowerHeight);
         
+    }
+
+    public void drawGoalieMeters(Graphics g) {
+        Color darkTrackBg = new Color(30, 30, 35);
+
+        // METER 1: LEFT / RIGHT
+        g.setColor(Color.BLACK);
+        g.fillRect(1016, 136, 248, 48);
+        g.setColor(darkTrackBg);
+        g.fillRect(1020, 140, 240, 40);
+        g.setColor(new Color(0, 180, 216));
+        g.fillRect(1020, 140, 240, 4);
+        g.fillRect(1020, 176, 240, 4);
+        g.fillRect(1020, 140, 4, 40);
+        g.fillRect(1256, 140, 4, 40);
+        g.setColor(Color.WHITE);
+        g.fillRect(model.intGoalieLeftRightLineX - 2, 140, 4, 40);
+
+        // METER 2: UP / DOWN
+        g.setColor(Color.BLACK);
+        g.fillRect(1116, 226, 48, 248);
+        g.setColor(darkTrackBg);
+        g.fillRect(1120, 230, 40, 240);
+        g.setColor(new Color(247, 127, 0));
+        g.fillRect(1120, 230, 40, 4);
+        g.fillRect(1120, 466, 40, 4);
+        g.fillRect(1120, 230, 4, 240);
+        g.fillRect(1156, 230, 4, 240);
+        g.setColor(Color.WHITE);
+        g.fillRect(1120, model.intGoalieUpDownLineY - 2, 40, 4);
     }
 
     // Constructor

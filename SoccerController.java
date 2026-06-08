@@ -192,7 +192,10 @@ public class SoccerController implements ActionListener, KeyListener {
 
             String[] strSplit = model.strNetText.split(",");
 
-            if (strSplit[0].equals("Joined")) {
+            if (strSplit[0].startsWith("Chat:")) {
+                String cleanMsg = model.strNetText.substring(5);
+                view.chatArea.append("Opponent: " + cleanMsg + "\n");
+            } else if (strSplit[0].equals("Joined")) {
                 model.blnConnected = true;
                 model.connectSSM.sendText("Start");
                 System.out.println("Client joined");
@@ -252,6 +255,17 @@ public class SoccerController implements ActionListener, KeyListener {
                 updatePickStatus();
 
                 System.out.println("Opponent picked");
+            } else if (strSplit[0].equals("PHASE")) {
+                // Sync the game phase from the other computer.
+                // This lets the goalie computer start its goalie sliders after the striker shoots.
+                model.intGamePhase = Integer.parseInt(strSplit[1]);
+
+                if (model.intGamePhase == 2 || model.intGamePhase == 4) {
+                    // Reset goalie sliders exactly when the goalie input phase begins.
+                    model.resetGoalie();
+                }
+
+                view.thePanel.repaint();
             }
         }
 
@@ -318,24 +332,33 @@ public class SoccerController implements ActionListener, KeyListener {
 				view.chatArea.append("You: " + view.chatField.getText() + "\n");
 				view.chatField.setText("");
 			}
-			
-		} else if (model.connectSSM != null && evt.getSource() == model.connectSSM) {
-			String strLine = model.connectSSM.readText();
-			
-			// Check if the incoming string packet is a chat message
-			if (strLine.startsWith("Chat:")) {
-				String cleanMsg = strLine.substring(5); // Remove "Chat:" prefix
-				view.chatArea.append("Opponent: " + cleanMsg + "\n");
-			} else {
-				// ... your existing game data transmission parsing logic goes here ...
-			}
 		}
 		if (evt.getSource() == theTimer) {
             if (model.intGamePhase > 0) {
-                if (!model.blnShooting) {
+                // Keep the Power label only on the local shooting screen.
+                // Goalie view has only Left/Right and Up/Down meters.
+                view.lblPower.setVisible(model.shouldLocalViewShowShooting());
+
+                if (model.isLocalShooterInputTurn() && !model.blnShooting) {
+                    // Only the local striker's computer moves shooting sliders.
+                    // The opponent's shooting input acts like null/no input.
                     model.moveShotSliders();
-                } else {
-                    model.animateBall();
+                } else if (model.blnShooting) {
+                    if (model.animateBall()) {
+                        model.intGamePhase = 2;
+                        model.resetGoalie();
+                        view.lblPower.setVisible(false);
+
+                        if (model.connectSSM != null) {
+                            // Tell the opponent computer to enter goalie input phase too.
+                            // Without this, the goalie screen appears but its sliders stay frozen.
+                            model.connectSSM.sendText("PHASE,2");
+                        }
+                    }
+                } else if (model.isLocalGoalieInputTurn()) {
+                    // Only the local goalie's computer moves goalie sliders.
+                    // The striker/opponent computer sees a frozen waiting view.
+                    model.moveGoalieSliders();
                 }
                 view.thePanel.repaint();
             }
@@ -349,6 +372,7 @@ public class SoccerController implements ActionListener, KeyListener {
 	public void startGameplay() {
 		model.intGamePhase = 1;
 		model.resetShot();
+		model.resetGoalie();
 
 		view.setMainVisible(false);
 		view.setConnectVisible(false);
@@ -360,6 +384,7 @@ public class SoccerController implements ActionListener, KeyListener {
 		// Completely hide both old label text layers
 		view.scoreLabel.setVisible(false); 
 		view.turnLabel.setVisible(false); 
+        view.lblPower.setVisible(true);
 		
 		theTimer.start();
 		view.thePanel.revalidate();
@@ -370,7 +395,29 @@ public class SoccerController implements ActionListener, KeyListener {
 
     public void keyReleased(KeyEvent evt) {
         if (evt.getKeyCode() == KeyEvent.VK_SPACE && model.intGamePhase > 0) {
-            if (model.intShotStage == 1) {
+            if (!model.isLocalShooterInputTurn() && !model.isLocalGoalieInputTurn()) {
+                // If it is not this computer's turn, ignore spacebar completely.
+                // This makes opponent input act like null/no input.
+                return;
+            }
+
+            if (model.isLocalGoalieInputTurn()) {
+                // Goalie spacebar input:
+                // Stage 1 locks Left/Right, then Stage 2 locks Up/Down.
+                if (model.intGoalieStage == 1) {
+                    model.dblGoalieFinalLeftRightPercent = ((double)(model.intGoalieLeftRightLineX - 1020) / 240.0) * 100.0;
+                    model.intGoalieStage = 2;
+                } else if (model.intGoalieStage == 2) {
+                    model.dblGoalieFinalUpDownPercent = ((double)(model.intGoalieUpDownLineY - 230) / 240.0) * 100.0;
+                    model.intGoalieStage = 3;
+
+                    System.out.println("Goalie locked:");
+                    System.out.println("Left/Right: " + model.dblGoalieFinalLeftRightPercent);
+                    System.out.println("Up/Down: " + model.dblGoalieFinalUpDownPercent);
+                }
+            } else if (model.intShotStage == 1) {
+                // Striker spacebar input:
+                // Stage 1 locks Left/Right, Stage 2 locks Up/Down, Stage 3 locks Power.
                 model.dblFinalLeftRightPercent = ((double)(model.intLeftRightLineX - 1020) / 240.0) * 100.0;
                 model.intShotStage = 2;
             } else if (model.intShotStage == 2) {
@@ -378,6 +425,7 @@ public class SoccerController implements ActionListener, KeyListener {
                 model.intShotStage = 3;
             } else if (model.intShotStage == 3) {
                 model.dblFinalPowerPercent = ((double)(model.intPowerLineX - 1020) / 240.0) * 100.0;
+                model.calculateTarget();
                 model.blnShooting = true;
                 model.intShotStage = 4;
 

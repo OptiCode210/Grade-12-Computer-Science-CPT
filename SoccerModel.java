@@ -77,6 +77,17 @@ public class SoccerModel {
 
     public boolean blnShooting = false;
 
+    // Goalie mechanic variables
+    public int intGoalieStage = 1;
+    public int intGoalieLeftRightLineX = 1140;
+    public int intGoalieUpDownLineY = 350;
+
+    public int intGoalieLeftRightSpeed = 4;
+    public int intGoalieUpDownSpeed = 5;
+
+    public double dblGoalieFinalLeftRightPercent = 0.0;
+    public double dblGoalieFinalUpDownPercent = 0.0;
+
 
 
     //Completed boolean values
@@ -170,6 +181,97 @@ public class SoccerModel {
                 intPowerSpeed = -intPowerSpeed;
             }
         }
+    }
+
+    public int getCurrentSavingKeeperAgility() {
+        if (intGamePhase == 2) {
+            return intP2KAgi;
+        } else if (intGamePhase == 4) {
+            return intP1KAgi;
+        }
+        return keeperAgility;
+    }
+
+    public void resetGoalie() {
+        intGoalieStage = 1;
+        intGoalieLeftRightLineX = 1140;
+        intGoalieUpDownLineY = 350;
+        intGoalieLeftRightSpeed = 4;
+        intGoalieUpDownSpeed = 5;
+        dblGoalieFinalLeftRightPercent = 0.0;
+        dblGoalieFinalUpDownPercent = 0.0;
+    }
+
+    public void moveGoalieSliders() {
+        int intAgilitySpeed = Math.max(1, getCurrentSavingKeeperAgility() / 2);
+
+        if (intGoalieStage == 1) {
+            if (intGoalieLeftRightSpeed > 0) {
+                intGoalieLeftRightLineX += intAgilitySpeed;
+            } else {
+                intGoalieLeftRightLineX -= intAgilitySpeed;
+            }
+
+            if (intGoalieLeftRightLineX <= 1020 || intGoalieLeftRightLineX >= 1260) {
+                intGoalieLeftRightSpeed = -intGoalieLeftRightSpeed;
+
+                if (intGoalieLeftRightLineX < 1020) {
+                    intGoalieLeftRightLineX = 1020;
+                }
+
+                if (intGoalieLeftRightLineX > 1260) {
+                    intGoalieLeftRightLineX = 1260;
+                }
+            }
+        } else if (intGoalieStage == 2) {
+            if (intGoalieUpDownSpeed > 0) {
+                intGoalieUpDownLineY += intAgilitySpeed;
+            } else {
+                intGoalieUpDownLineY -= intAgilitySpeed;
+            }
+
+            if (intGoalieUpDownLineY <= 230 || intGoalieUpDownLineY >= 470) {
+                intGoalieUpDownSpeed = -intGoalieUpDownSpeed;
+
+                if (intGoalieUpDownLineY < 230) {
+                    intGoalieUpDownLineY = 230;
+                }
+
+                if (intGoalieUpDownLineY > 470) {
+                    intGoalieUpDownLineY = 470;
+                }
+            }
+        }
+    }
+
+    public boolean isLocalShooterInputTurn() {
+        // True only when this computer is controlling the striker.
+        // This prevents the goalie/opponent computer from moving shooting sliders.
+        return (intGamePhase == 1 && intPicking == 1) || (intGamePhase == 3 && intPicking == 2);
+    }
+
+    public boolean isLocalGoalieInputTurn() {
+        // True only when this computer is controlling the goalie save input.
+        // The goalie can see the goalie screen earlier, but sliders move only here.
+        return (intGamePhase == 2 && intPicking == 2) || (intGamePhase == 4 && intPicking == 1);
+    }
+
+    public boolean shouldLocalViewShowGoalie() {
+        // During the striker's turn, the opponent should see the goalie screen.
+        // The goalie sliders stay frozen until the phase becomes their goalie input turn.
+        return (intGamePhase == 1 && intPicking == 2) ||
+               (intGamePhase == 2 && intPicking == 2) ||
+               (intGamePhase == 3 && intPicking == 1) ||
+               (intGamePhase == 4 && intPicking == 1);
+    }
+
+    public boolean shouldLocalViewShowShooting() {
+        // The striker sees the shooting screen while shooting and while waiting
+        // for the goalie result after their shot.
+        return (intGamePhase == 1 && intPicking == 1) ||
+               (intGamePhase == 2 && intPicking == 1) ||
+               (intGamePhase == 3 && intPicking == 2) ||
+               (intGamePhase == 4 && intPicking == 2);
     }
 
     public void calculateTarget() {

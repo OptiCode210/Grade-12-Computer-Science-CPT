@@ -372,6 +372,11 @@ public class SoccerView extends JPanel {
                     g.drawImage(menuBG, 0, 0, 1280, 720, null);
                 }
 
+                if (SoccerView.this.model.isPlayAnimationRunning()) {
+                    drawPlayAnimation(g);
+                    return;
+                }
+
                 if (SoccerView.this.model.shouldLocalViewShowShooting()) {
                     // The local striker sees the shooting screen.
                     // After shooting, this screen can remain as a waiting/result view.
@@ -432,6 +437,93 @@ public class SoccerView extends JPanel {
 
         drawProfessionalScoreboard(g);
         drawGoalieMeters(g);
+
+        if (model.blnShowHitbox && model.intGoalieStage == 3) {
+            // Draw the coverage-based goalie hitbox after both goalie sliders lock.
+            // This is a debug view so we can see why a shot was saved or scored.
+            drawGoalieHitbox(g);
+        }
+
+    }
+
+    public void drawPlayAnimation(Graphics g) {
+        BufferedImage strikerImage = getShootingStrikerImage();
+        BufferedImage keeperImage = getAnimatingKeeperImage();
+
+        if (shootingBG != null) g.drawImage(shootingBG, 0, 0, 1280, 720, null);
+        if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
+        if (keeperImage != null) g.drawImage(keeperImage, model.intAnimGoalieX, model.intAnimGoalieY, null);
+        if (ballImg != null) g.drawImage(ballImg, model.intAnimBallX, model.intAnimBallY, null);
+        if (strikerImage != null) g.drawImage(strikerImage, model.intAnimStrikerX, model.intAnimStrikerY, null);
+
+        drawProfessionalScoreboard(g);
+    }
+
+    private BufferedImage getShootingStrikerImage() {
+        String strStrikerName;
+
+        if (model.intGamePhase == 2) {
+            strStrikerName = model.strP1S;
+        } else {
+            strStrikerName = model.strP2S;
+        }
+
+        if (strStrikerName != null && strStrikerName.equals(model.strikers[1][0])) {
+            if (model.blnAnimShowShoot) {
+                return S2Shoot;
+            } else if (model.blnAnimShowRun) {
+                return S2Run;
+            }
+
+            return S2Stand;
+        } else if (strStrikerName != null && strStrikerName.equals(model.strikers[2][0])) {
+            if (model.blnAnimShowShoot) {
+                return S3Shoot;
+            } else if (model.blnAnimShowRun) {
+                return S3Run;
+            }
+
+            return S3Stand;
+        }
+
+        if (model.blnAnimShowShoot) {
+            return S1Shoot;
+        } else if (model.blnAnimShowRun) {
+            return S1Run;
+        }
+
+        return S1Stand;
+    }
+
+    private BufferedImage getAnimatingKeeperImage() {
+        String strKeeperName;
+        boolean blnDiveRight = model.dblGoalieFinalLeftRightPercent >= 50.0;
+
+        if (model.intGamePhase == 2) {
+            strKeeperName = model.strP2K;
+        } else {
+            strKeeperName = model.strP1K;
+        }
+
+        if (strKeeperName != null && strKeeperName.equals(model.keepers[1][0])) {
+            if (model.blnAnimShowDive) {
+                return blnDiveRight ? K2Right : K2Left;
+            }
+
+            return K2Stand;
+        } else if (strKeeperName != null && strKeeperName.equals(model.keepers[2][0])) {
+            if (model.blnAnimShowDive) {
+                return blnDiveRight ? K3Right : K3Left;
+            }
+
+            return K3Stand;
+        }
+
+        if (model.blnAnimShowDive) {
+            return blnDiveRight ? K1Right : K1Left;
+        }
+
+        return K1Stand;
     }
 
     private BufferedImage getSavingKeeperImage() {
@@ -603,6 +695,36 @@ public class SoccerView extends JPanel {
         g.fillRect(1156, 230, 4, 240);
         g.setColor(Color.WHITE);
         g.fillRect(1120, model.intGoalieUpDownLineY - 2, 40, 4);
+    }
+
+    public void drawGoalieHitbox(Graphics g) {
+        //method for visualizing the hitbox
+        int goalLeft = 315;
+        int goalRight = 940;
+        int goalTop = 275;
+        int goalBottom = 500;
+
+        int intCoverage = model.getCurrentKeeperCoverage();
+        double dblHitboxWidthPercent = 18 + (intCoverage * 2);
+        double dblHitboxHeightPercent = 28 + (intCoverage * 2);
+
+        int intGoalieCenterX = goalLeft + (int)(model.dblGoalieFinalLeftRightPercent / 100.0 * (goalRight - goalLeft));
+        int intGoalieCenterY = goalTop + (int)(model.dblGoalieFinalUpDownPercent / 100.0 * (goalBottom - goalTop));
+
+        int intHitboxWidth = (int)((dblHitboxWidthPercent / 100.0) * (goalRight - goalLeft));
+        int intHitboxHeight = (int)((dblHitboxHeightPercent / 100.0) * (goalBottom - goalTop));
+
+        g.setColor(new Color(0, 255, 0, 90));
+        g.fillRect(
+            intGoalieCenterX - intHitboxWidth / 2,
+            intGoalieCenterY - intHitboxHeight / 2,
+            intHitboxWidth,
+            intHitboxHeight
+        );
+    }
+
+    public void winningAnimation(Graphics g){
+
     }
 
     // Constructor

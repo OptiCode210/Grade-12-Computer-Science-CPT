@@ -1,6 +1,3 @@
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.KeyListener;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
@@ -65,12 +62,96 @@ public class SoccerController implements ActionListener, KeyListener {
     private void updatePickStatus() {
         if (model.blnSentPicks && model.blnReceivedPicks) {
             view.pickLabel.setText("Both locked in!");
-            System.out.println("----------------------------------------");
 
             startGameplay();    //starts main game
 
         } else if (model.blnSentPicks) {
             view.pickLabel.setText("Waiting for other player...");
+        }
+    }
+
+    private void startPlayAnimation(boolean blnShotSaved) {
+        model.blnShotSaved = blnShotSaved;
+        model.blnResultReady = true;
+        boolean blnGoalScoredThisTurn = false;
+
+        if (!model.blnShotSaved && !model.blnResultScored) {
+            if (model.intGamePhase == 2) {
+                model.intP1Score++;
+            } else if (model.intGamePhase == 4) {
+                model.intP2Score++;
+            }
+
+            model.blnResultScored = true;
+            blnGoalScoredThisTurn = true;
+        }
+
+        if (model.blnShotSaved) {
+            System.out.println("Shot saved");
+        } else {
+            System.out.println("Goal scored");
+        }
+
+        if (blnGoalScoredThisTurn &&
+            !model.blnWinningAnimationPrinted &&
+            (model.intP1Score >= model.intWinningScore || model.intP2Score >= model.intWinningScore)) {
+            System.out.println("winning animation here");
+            model.blnWinningAnimationPrinted = true;
+        }
+
+        model.startPlayAnimation();
+        view.thePanel.repaint();
+    }
+
+    private void finishPlayAnimation() {
+        if (model.intGamePhase == 2) {
+            model.intGamePhase = 3;
+        } else if (model.intGamePhase == 4) {
+            model.intGamePhase = 1;
+        }
+
+        model.blnResultReady = false;
+        model.blnResultScored = false;
+        model.resetShot();
+        model.resetGoalie();
+        view.lblLeftRight.setVisible(true);
+        view.lblUpDown.setVisible(true);
+        view.lblPower.setVisible(model.shouldLocalViewShowShooting());
+    }
+
+    private void sendShotData() {
+        if (model.connectSSM != null) {
+            model.connectSSM.sendText("SHOT," + model.dblFinalLeftRightPercent + "," + model.dblFinalUpDownPercent + "," + model.dblFinalPowerPercent);
+        }
+    }
+
+    private void sendAnimationData() {
+        if (model.connectSSM != null) {
+            // Send one full animation packet after both players have finished input.
+            // This keeps host and client using the same shot, save, and result values.
+            String strAnimMessage = "ANIM," + model.blnShotSaved + "," +
+                model.dblFinalLeftRightPercent + "," +
+                model.dblFinalUpDownPercent + "," +
+                model.dblFinalPowerPercent + "," +
+                model.dblGoalieFinalLeftRightPercent + "," +
+                model.dblGoalieFinalUpDownPercent;
+
+            model.connectSSM.sendText(strAnimMessage);
+        }
+    }
+
+    private void advanceToGoaliePhase() {
+        if (model.intGamePhase == 1) {
+            model.intGamePhase = 2;
+        } else if (model.intGamePhase == 3) {
+            model.intGamePhase = 4;
+        }
+
+        model.resetGoalie();
+        view.lblPower.setVisible(false);
+
+        if (model.connectSSM != null) {
+            model.connectSSM.sendText("PHASE," + model.intGamePhase);
         }
     }
 
@@ -93,10 +174,6 @@ public class SoccerController implements ActionListener, KeyListener {
         }
 
         refreshSelectionLabels();
-
-        System.out.println("Name: " + model.strikerName);
-        System.out.println("Accuracy: " + model.strikerAccuracy);
-        System.out.println("Power: " + model.strikerPower);
 
         //checks if selection works
         if (model.connectSSM != null) { 
@@ -123,10 +200,6 @@ public class SoccerController implements ActionListener, KeyListener {
         }
 
         refreshSelectionLabels();
-
-        System.out.println("Name: " + model.keeperName);
-        System.out.println("Agility: " + model.keeperAgility);
-        System.out.println("Coverage: " + model.keeperCoverage);
 
         //checks if selection works
         if (model.connectSSM != null) {
@@ -173,14 +246,28 @@ public class SoccerController implements ActionListener, KeyListener {
                 model.intPicking = 2;
                 model.connectSSM = new SuperSocketMaster(model.strServerID, 6112, this);
 
-                if (model.connectSSM.connect()) {   //connection successful
-                    System.out.println("CONNECTED");
-                    model.connectSSM.sendText("Joined");
-                } else {    //connection failed
-                    model.blnConnected = false;
-                    model.connectSSM = null;
-                    JOptionPane.showMessageDialog(view.theFrame, "Could not connect. Try the IP again.");
-                }
+                final SuperSocketMaster attemptedConnection = model.connectSSM;
+
+                // Run the connection  on a background thread so the window does not freeze
+                new Thread(new Runnable() {
+                    public void run() {
+                        final boolean blnSuccess = attemptedConnection.connect();
+
+                        // Swing components must be updated on the Swing event thread.
+                        SwingUtilities.invokeLater(new Runnable() {
+                            public void run() {
+                                if (blnSuccess) {   //connection successful
+                                    System.out.println("CONNECTED");
+                                    attemptedConnection.sendText("Joined");
+                                } else {    //connection failed
+                                    model.blnConnected = false;
+                                    model.connectSSM = null;
+                                    JOptionPane.showMessageDialog(view.theFrame, "Could not connect. Try the IP again.");
+                                }
+                            }
+                        });
+                    }
+                }).start();
             }
         }
 
@@ -266,6 +353,30 @@ public class SoccerController implements ActionListener, KeyListener {
                 }
 
                 view.thePanel.repaint();
+            } else if (strSplit[0].equals("SHOT")) {
+                model.dblFinalLeftRightPercent = Double.parseDouble(strSplit[1]);
+                model.dblFinalUpDownPercent = Double.parseDouble(strSplit[2]);
+                model.dblFinalPowerPercent = Double.parseDouble(strSplit[3]);
+                model.calculateTarget();
+                model.intShotStage = 4;
+                view.thePanel.repaint();
+            } else if (strSplit[0].equals("ANIM")) {
+                // Both computers use this same animation packet so the striker,
+                // ball, and goalie all animate from the same saved shot data.
+                model.blnShotSaved = Boolean.parseBoolean(strSplit[1]);
+
+                // Shot slider values from the shooter.
+                model.dblFinalLeftRightPercent = Double.parseDouble(strSplit[2]);
+                model.dblFinalUpDownPercent = Double.parseDouble(strSplit[3]);
+                model.dblFinalPowerPercent = Double.parseDouble(strSplit[4]);
+
+                // Goalie slider values from the saver.
+                model.dblGoalieFinalLeftRightPercent = Double.parseDouble(strSplit[5]);
+                model.dblGoalieFinalUpDownPercent = Double.parseDouble(strSplit[6]);
+
+                // Rebuild the exact same ball target before starting the animation.
+                model.calculateTarget();
+                startPlayAnimation(model.blnShotSaved);
             }
         }
 
@@ -335,27 +446,27 @@ public class SoccerController implements ActionListener, KeyListener {
 		}
 		if (evt.getSource() == theTimer) {
             if (model.intGamePhase > 0) {
-                // Keep the Power label only on the local shooting screen.
-                // Goalie view has only Left/Right and Up/Down meters.
-                view.lblPower.setVisible(model.shouldLocalViewShowShooting());
+                if (model.isPlayAnimationRunning()) {
+                    view.lblLeftRight.setVisible(false);
+                    view.lblUpDown.setVisible(false);
+                    view.lblPower.setVisible(false);
 
-                if (model.isLocalShooterInputTurn() && !model.blnShooting) {
+                    if (model.updatePlayAnimation()) {
+                        finishPlayAnimation();
+                    }
+                } else if (model.isLocalShooterInputTurn() && !model.blnShooting) {
+                    view.lblLeftRight.setVisible(true);
+                    view.lblUpDown.setVisible(true);
+                    view.lblPower.setVisible(model.shouldLocalViewShowShooting());
+
                     // Only the local striker's computer moves shooting sliders.
                     // The opponent's shooting input acts like null/no input.
                     model.moveShotSliders();
-                } else if (model.blnShooting) {
-                    if (model.animateBall()) {
-                        model.intGamePhase = 2;
-                        model.resetGoalie();
-                        view.lblPower.setVisible(false);
-
-                        if (model.connectSSM != null) {
-                            // Tell the opponent computer to enter goalie input phase too.
-                            // Without this, the goalie screen appears but its sliders stay frozen.
-                            model.connectSSM.sendText("PHASE,2");
-                        }
-                    }
                 } else if (model.isLocalGoalieInputTurn()) {
+                    view.lblLeftRight.setVisible(true);
+                    view.lblUpDown.setVisible(true);
+                    view.lblPower.setVisible(model.shouldLocalViewShowShooting());
+
                     // Only the local goalie's computer moves goalie sliders.
                     // The striker/opponent computer sees a frozen waiting view.
                     model.moveGoalieSliders();
@@ -392,9 +503,12 @@ public class SoccerController implements ActionListener, KeyListener {
 		view.thePanel.requestFocusInWindow();
 	}
 
-
     public void keyReleased(KeyEvent evt) {
         if (evt.getKeyCode() == KeyEvent.VK_SPACE && model.intGamePhase > 0) {
+            if (model.isPlayAnimationRunning()) {
+                return;
+            }
+
             if (!model.isLocalShooterInputTurn() && !model.isLocalGoalieInputTurn()) {
                 // If it is not this computer's turn, ignore spacebar completely.
                 // This makes opponent input act like null/no input.
@@ -411,9 +525,13 @@ public class SoccerController implements ActionListener, KeyListener {
                     model.dblGoalieFinalUpDownPercent = ((double)(model.intGoalieUpDownLineY - 230) / 240.0) * 100.0;
                     model.intGoalieStage = 3;
 
-                    System.out.println("Goalie locked:");
-                    System.out.println("Left/Right: " + model.dblGoalieFinalLeftRightPercent);
-                    System.out.println("Up/Down: " + model.dblGoalieFinalUpDownPercent);
+                    // Once both goalie sliders are locked, use the model's
+                    // coverage-based hitbox logic to decide SAVE or GOAL.
+                    model.blnShotSaved = model.isShotSaved();
+
+                    startPlayAnimation(model.blnShotSaved);
+
+                    sendAnimationData();
                 }
             } else if (model.intShotStage == 1) {
                 // Striker spacebar input:
@@ -426,13 +544,9 @@ public class SoccerController implements ActionListener, KeyListener {
             } else if (model.intShotStage == 3) {
                 model.dblFinalPowerPercent = ((double)(model.intPowerLineX - 1020) / 240.0) * 100.0;
                 model.calculateTarget();
-                model.blnShooting = true;
                 model.intShotStage = 4;
-
-                System.out.println("Shot locked:");
-                System.out.println("Left/Right: " + model.dblFinalLeftRightPercent);
-                System.out.println("Up/Down: " + model.dblFinalUpDownPercent);
-                System.out.println("Power: " + model.dblFinalPowerPercent);
+                sendShotData();
+                advanceToGoaliePhase();
             }
         }
     }

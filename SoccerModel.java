@@ -57,6 +57,7 @@ public class SoccerModel {
     int intP1Score = 0;
     public int intP2Score = 0;
     int intWinningScore = 5;
+    public boolean blnWinningAnimationPrinted = false;
 
     //shooting mechanic variables
     public int intShotStage = 1;
@@ -87,6 +88,36 @@ public class SoccerModel {
 
     public double dblGoalieFinalLeftRightPercent = 0.0;
     public double dblGoalieFinalUpDownPercent = 0.0;
+
+    // Result variables for the save/goal check.
+    // blnResultReady becomes true once the goalie finishes both sliders.
+    public boolean blnShotSaved = false;
+    public boolean blnResultReady = false;
+    public boolean blnResultScored = false;
+    public boolean blnShowHitbox = true;
+
+    // MVC animation state:
+    // The model stores the numbers for the play animation so animation.java is not needed.
+    public boolean blnPlayAnimationRunning = false;
+    public int intPlayAnimationFrame = 0;
+    public int intPlayAnimationTotalFrames = 130;
+
+    public int intAnimStrikerX = 340;
+    public int intAnimStrikerY = 440;
+    public int intAnimGoalieX = 450;
+    public int intAnimGoalieY = 340;
+    public int intAnimBallX = 610;
+    public int intAnimBallY = 550;
+
+    public boolean blnAnimShowRun = false;
+    public boolean blnAnimShowShoot = false;
+    public boolean blnAnimShowDive = false;
+
+    private double dblAnimBallX = 610.0;
+    private double dblAnimBallY = 550.0;
+    private int intAnimBallFrame = 0;
+    private int intAnimBallTotalFrames = 45;
+    private boolean blnAnimBallFinished = false;
 
 
 
@@ -278,8 +309,8 @@ public class SoccerModel {
         // Target coordinates based on open net area inside the view frame
         int goalLeft = 315;
         int goalRight = 940;
-        int goalTop = 330;
-        int goalBottom = 450;
+        int goalTop = 275;
+        int goalBottom = 500;
 
         double targetCenterX = goalLeft + ((dblFinalLeftRightPercent / 100.0) * (goalRight - goalLeft));
         double targetCenterY = goalTop + ((dblFinalUpDownPercent / 100.0) * (goalBottom - goalTop));
@@ -325,6 +356,170 @@ public class SoccerModel {
         return false;
     }
 
+    public void startPlayAnimation() {
+        // Starts the MVC play animation after both players finish input.
+        // The controller calls this; the view only draws these stored values.
+        blnPlayAnimationRunning = true;
+        blnShooting = true;
+
+        intPlayAnimationFrame = 0;
+        intPlayAnimationTotalFrames = 130;
+
+        intAnimStrikerX = 340;
+        intAnimStrikerY = 440;
+        intAnimGoalieX = 450;
+        intAnimGoalieY = 340;
+        intAnimBallX = 610;
+        intAnimBallY = 550;
+
+        blnAnimShowRun = true;
+        blnAnimShowShoot = false;
+        blnAnimShowDive = false;
+        blnAnimBallFinished = false;
+
+        dblAnimBallX = 610.0;
+        dblAnimBallY = 550.0;
+        intAnimBallFrame = 0;
+        intAnimBallTotalFrames = intShotTotalFrames;
+
+        if (intAnimBallTotalFrames < 1) {
+            intAnimBallTotalFrames = 1;
+        }
+    }
+
+    public boolean updatePlayAnimation() {
+        // Advances the animation by one timer frame.
+        // Returns true when the scene is finished so the controller can switch turns.
+        if (!blnPlayAnimationRunning) {
+            return false;
+        }
+
+        intPlayAnimationFrame++;
+
+        if (intPlayAnimationFrame < 35) {
+            // First part: striker runs toward the ball.
+            blnAnimShowRun = true;
+            blnAnimShowShoot = false;
+            blnAnimShowDive = false;
+            intAnimStrikerX = 340 + (intPlayAnimationFrame * 5);
+        } else {
+            // Second part: striker switches to shooting image.
+            blnAnimShowRun = false;
+            blnAnimShowShoot = true;
+            intAnimStrikerX = 520;
+        }
+
+        if (intPlayAnimationFrame >= 42 && !blnAnimBallFinished) {
+            // Ball starts moving a little after the shoot image appears.
+            blnAnimBallFinished = moveAnimationBall();
+        }
+
+        if (intPlayAnimationFrame >= 52) {
+            // Goalie starts diving after the ball leaves the striker.
+            blnAnimShowDive = true;
+            moveAnimationGoalie();
+        }
+
+        if (intPlayAnimationFrame >= intPlayAnimationTotalFrames) {
+            stopPlayAnimation();
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean moveAnimationBall() {
+        // Moves the ball from the penalty spot to the target calculated by the shot sliders.
+        intAnimBallFrame++;
+
+        double dblProgress = (double) intAnimBallFrame / (double) intAnimBallTotalFrames;
+        if (dblProgress > 1.0) {
+            dblProgress = 1.0;
+        }
+
+        double dblEasedProgress = 1.0 - Math.pow(1.0 - dblProgress, 3);
+        dblAnimBallX = 610.0 + ((dblTargetX - 610.0) * dblEasedProgress);
+        dblAnimBallY = 550.0 + ((dblTargetY - 550.0) * dblEasedProgress);
+
+        intAnimBallX = (int) Math.round(dblAnimBallX);
+        intAnimBallY = (int) Math.round(dblAnimBallY);
+
+        if (dblProgress >= 1.0) {
+            intAnimBallX = (int) Math.round(dblTargetX);
+            intAnimBallY = (int) Math.round(dblTargetY);
+            return true;
+        }
+
+        return false;
+    }
+
+    private void moveAnimationGoalie() {
+        // Moves the goalie toward the same goal point used by drawGoalieHitbox.
+        // This keeps the dive image aligned with the actual save area.
+        int intDiveFrame = intPlayAnimationFrame - 52;
+
+        if (intDiveFrame > 30) {
+            intDiveFrame = 30;
+        }
+
+        double dblProgress = (double) intDiveFrame / 30.0;
+
+        int goalLeft = 315;
+        int goalRight = 940;
+        int goalTop = 275;
+        int goalBottom = 500;
+
+        int intGoalieCenterX = goalLeft + (int)(dblGoalieFinalLeftRightPercent / 100.0 * (goalRight - goalLeft));
+        int intGoalieCenterY = goalTop + (int)(dblGoalieFinalUpDownPercent / 100.0 * (goalBottom - goalTop));
+
+        int intTargetGoalieX = intGoalieCenterX - 75;
+        int intTargetGoalieY = intGoalieCenterY - 80;
+
+        intAnimGoalieX = 450 + (int)((intTargetGoalieX - 450) * dblProgress);
+        intAnimGoalieY = 340 + (int)((intTargetGoalieY - 340) * dblProgress);
+    }
+
+    public void stopPlayAnimation() {
+        // Clears the animation state so normal shooter/goalie screens can draw again.
+        blnPlayAnimationRunning = false;
+        blnShooting = false;
+        intPlayAnimationFrame = 0;
+        blnAnimShowRun = false;
+        blnAnimShowShoot = false;
+        blnAnimShowDive = false;
+        blnAnimBallFinished = false;
+    }
+
+    public boolean isPlayAnimationRunning() {
+        return blnPlayAnimationRunning;
+    }
+
+    public int getCurrentKeeperCoverage(){
+        if (intGamePhase == 2){
+            return intP2KCvg;
+        }else if (intGamePhase == 4){
+            return intP1KCvg;
+        }
+
+        return keeperCoverage;
+    }
+
+    public boolean isShotSaved(){
+        int intCoverage = getCurrentKeeperCoverage();
+
+        double dblHitboxWidth = 18 + (intCoverage * 2);
+        double dblHitboxHeight = 28 + (intCoverage * 2);
+
+        //get the difference in the x axis (saved or not)
+        double dblLeftRightDifference = Math.abs(dblFinalLeftRightPercent - dblGoalieFinalLeftRightPercent);
+
+        //get the difference in the y axis (saved or not)
+        double dblUpDownDifference = Math.abs(dblFinalUpDownPercent - dblGoalieFinalUpDownPercent);
+
+        //if left right is < hitbox -> true
+        //if up down is smaller than hitbox
+        return dblLeftRightDifference <= dblHitboxWidth && dblUpDownDifference <= dblHitboxHeight;
+    }
 
     // Constructor.
     public SoccerModel() {

@@ -147,7 +147,6 @@ public class SoccerView extends JPanel {
 
     private void initializePositions() {
         //creates the starting menu
-
         // Main menu setup.
         // These components are visible when the program first opens.
         playButton.setSize(300, 70);
@@ -419,9 +418,15 @@ public class SoccerView extends JPanel {
     }
 
 	public void drawShootingGame(Graphics g) {
-		if (shootingBG != null) g.drawImage(shootingBG, 0, 0, 1280, 720, null);
-		if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
-		if (ballImg != null) g.drawImage(ballImg, model.intBallX, model.intBallY, null);
+		if (shootingBG != null){
+			 g.drawImage(shootingBG, 0, 0, 1280, 720, null);
+		}
+		if (goalImg != null){
+			 g.drawImage(goalImg, 130, 160, null);
+		}
+		if (ballImg != null){
+			 g.drawImage(ballImg, model.intBallX, model.intBallY, null);
+		}
 
 		// New stylized scoreboard drawing
 		drawProfessionalScoreboard(g);
@@ -431,9 +436,15 @@ public class SoccerView extends JPanel {
     public void drawGoalieGame(Graphics g) {
 		BufferedImage keeperImage = getSavingKeeperImage();
 
-		if (shootingBG != null) g.drawImage(shootingBG, 0, 0, 1280, 720, null);
-		if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
-		if (keeperImage != null) g.drawImage(keeperImage, 450, 340, null);
+		if (shootingBG != null) {
+			g.drawImage(shootingBG, 0, 0, 1280, 720, null);
+		}
+		if (goalImg != null) {
+			g.drawImage(goalImg, 130, 160, null);
+		}
+		if (keeperImage != null){
+			 g.drawImage(keeperImage, 450, 340, null);
+		}
 
 		drawProfessionalScoreboard(g);
 		drawGoalieMeters(g);
@@ -470,18 +481,28 @@ public class SoccerView extends JPanel {
 
 		if (model.blnShowHitbox && model.intGoalieStage == 3) {
 			drawGoalieHitbox(g);
-    }
-}
+		}
+	}
 
     public void drawPlayAnimation(Graphics g) {
         BufferedImage strikerImage = getShootingStrikerImage();
         BufferedImage keeperImage = getAnimatingKeeperImage();
 
-        if (shootingBG != null) g.drawImage(shootingBG, 0, 0, 1280, 720, null);
-        if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
-        if (keeperImage != null) g.drawImage(keeperImage, model.intAnimGoalieX, model.intAnimGoalieY, null);
-        if (ballImg != null) g.drawImage(ballImg, model.intAnimBallX, model.intAnimBallY, null);
-        if (strikerImage != null) g.drawImage(strikerImage, model.intAnimStrikerX, model.intAnimStrikerY, null);
+        if (shootingBG != null) {
+			g.drawImage(shootingBG, 0, 0, 1280, 720, null);
+		}
+        if (goalImg != null) {
+			g.drawImage(goalImg, 130, 160, null);
+		}
+        if (keeperImage != null){
+			 g.drawImage(keeperImage, model.intAnimGoalieX, model.intAnimGoalieY, null);
+		}
+        if (ballImg != null){
+			 g.drawImage(ballImg, model.intAnimBallX, model.intAnimBallY, null);
+		}
+        if (strikerImage != null) {
+			g.drawImage(strikerImage, model.intAnimStrikerX, model.intAnimStrikerY, null);
+		}
 
         drawProfessionalScoreboard(g);
     }
@@ -742,12 +763,7 @@ public class SoccerView extends JPanel {
         int intHitboxHeight = (int)((dblHitboxHeightPercent / 100.0) * (goalBottom - goalTop));
 
         g.setColor(new Color(0, 255, 0, 90));
-        g.fillRect(
-            intGoalieCenterX - intHitboxWidth / 2,
-            intGoalieCenterY - intHitboxHeight / 2,
-            intHitboxWidth,
-            intHitboxHeight
-        );
+        g.fillRect(intGoalieCenterX - intHitboxWidth / 2, intGoalieCenterY - intHitboxHeight / 2,intHitboxWidth,intHitboxHeight);
     }
 
     public void winningAnimation(Graphics g){

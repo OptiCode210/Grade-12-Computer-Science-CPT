@@ -325,7 +325,9 @@ public class SoccerModel {
 
         // Dynamic speed based on power selection
         intShotTotalFrames = (int) (62 - (dblFinalPowerPercent * 0.40)); 
-        if (intShotTotalFrames < 18) intShotTotalFrames = 18;
+        if (intShotTotalFrames < 18){
+			 intShotTotalFrames = 18;
+		}
 
         dblBallX = intBallX;
         dblBallY = intBallY;
@@ -338,7 +340,9 @@ public class SoccerModel {
         intShotFrame++;
         
         double progress = (double) intShotFrame / intShotTotalFrames;
-        if (progress > 1.0) progress = 1.0;
+        if (progress > 1.0) {
+			progress = 1.0;
+		}
 
         // Clean cubic ease-out calculation for deceleration arc
         double easedProgress = 1.0 - Math.pow(1.0 - progress, 3);

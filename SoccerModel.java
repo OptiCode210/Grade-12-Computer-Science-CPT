@@ -57,6 +57,8 @@ public class SoccerModel {
     int intP1Score = 0;
     public int intP2Score = 0;
     int intWinningScore = 3;
+    // True when the final goal happens, but the final shot animation still needs to play.
+    public boolean blnPendingWinningAnimation = false;
     public boolean blnWinningAnimationPrinted = false;
 
     //shooting mechanic variables

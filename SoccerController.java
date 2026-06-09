@@ -103,8 +103,8 @@ public class SoccerController implements ActionListener, KeyListener {
 			}else if (model.intP2Score > model.intP1Score){
 				view.pickLabel.setText("PLAYER 2 WINS");
 			}
-            model.blnWinningAnimationPrinted = true;
-            view.hideGameComponentsForWin();
+            // Wait until the final shot animation finishes before showing the win screen.
+            model.blnPendingWinningAnimation = true;
         }
 
         model.startPlayAnimation();
@@ -124,9 +124,32 @@ public class SoccerController implements ActionListener, KeyListener {
         model.blnShowShootingHint = false;
         model.resetShot();
         model.resetGoalie();
+
+        if (model.blnPendingWinningAnimation) {
+            // Now that the final shooting/saving animation is done, show the win screen.
+            model.blnPendingWinningAnimation = false;
+            model.blnWinningAnimationPrinted = true;
+            view.hideGameComponentsForWin();
+            startCloseWindowTimer();
+            view.thePanel.repaint();
+            return;
+        }
+
         view.lblLeftRight.setVisible(true);
         view.lblUpDown.setVisible(true);
         view.lblPower.setVisible(model.shouldLocalViewShowShooting());
+    }
+
+    private void startCloseWindowTimer() {
+        // Show the win screen for 3 seconds, then close the game window.
+        Timer closeTimer = new Timer(3000, new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                theTimer.stop();
+                view.theFrame.dispose();
+            }
+        });
+        closeTimer.setRepeats(false);
+        closeTimer.start();
     }
 
     private void sendShotData() {

@@ -103,8 +103,8 @@ public class SoccerController implements ActionListener, KeyListener {
 			}else if (model.intP2Score > model.intP1Score){
 				view.pickLabel.setText("PLAYER 2 WINS");
 			}
-			view.winLabel.setVisible(true); 			
             model.blnWinningAnimationPrinted = true;
+            view.hideGameComponentsForWin();
         }
 
         model.startPlayAnimation();
@@ -565,8 +565,9 @@ public class SoccerController implements ActionListener, KeyListener {
 				model.intCircleBlurX = (int)(Math.random() * 101) - 50;
 				model.intCircleBlurY = (int)(Math.random() * 101) - 50;
                 model.intShotStage = 4;
-                sendShotData();
                 advanceToGoaliePhase();
+                // Send shot data after the goalie phase so the indicator turns on last.
+                sendShotData();
             }
         }
     }

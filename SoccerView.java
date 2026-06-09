@@ -340,6 +340,18 @@ public class SoccerView extends JPanel {
         chatExitLabel.setVisible(b);
     }
 
+    public void hideGameComponentsForWin() {
+        // Hide every gameplay label so the painted win screen is clean.
+        for (JComponent c : gameMenu) {
+            c.setVisible(false);
+        }
+
+        // Hide the chat UI so it does not cover the winning animation.
+        chatScroll.setVisible(false);
+        chatField.setVisible(false);
+        chatExitLabel.setVisible(false);
+    }
+
     public void setMainVisible(boolean b) { 
         //shortcut to set main menu components visibility
         for(JComponent c: mainMenu){

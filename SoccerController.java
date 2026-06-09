@@ -74,8 +74,6 @@ public class SoccerController implements ActionListener, KeyListener {
     private void startPlayAnimation(boolean blnShotSaved) {
         model.blnShotSaved = blnShotSaved;
         model.blnResultReady = true;
-        // Show the red shooting hint while the shot result is being animated.
-        model.blnShowShootingHint = true;
         boolean blnGoalScoredThisTurn = false;
         
         System.out.println("Shot: "+intShots);
@@ -160,6 +158,8 @@ public class SoccerController implements ActionListener, KeyListener {
         }
 
         model.resetGoalie();
+        // Hide the indicator until the striker's shot data is sent to the goalie.
+        model.blnShowShootingHint = false;
         view.lblPower.setVisible(false);
 
         if (model.connectSSM != null) {
@@ -371,6 +371,8 @@ public class SoccerController implements ActionListener, KeyListener {
                 model.dblFinalPowerPercent = Double.parseDouble(strSplit[3]);
                 model.calculateTarget();
                 model.intShotStage = 4;
+                // Show the red shooting hint as soon as the goalie receives the striker's shot.
+                model.blnShowShootingHint = true;
                 view.thePanel.repaint();
             } else if (strSplit[0].equals("ANIM")) {
                 // Both computers use this same animation packet so the striker,

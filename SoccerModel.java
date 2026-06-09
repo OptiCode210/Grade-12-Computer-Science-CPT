@@ -243,8 +243,8 @@ public class SoccerModel {
     }
 
     public void moveGoalieSliders() {
-        // Use keeper agility, but make the goalie sliders faster overall.
-        int intAgilitySpeed = Math.max(1, getCurrentSavingKeeperAgility());
+        // Boost goalie movement so the goalie sliders feel faster.
+        int intAgilitySpeed = Math.max(6, getCurrentSavingKeeperAgility() * 2);
 
         if (intGoalieStage == 1) {
             if (intGoalieLeftRightSpeed > 0) {

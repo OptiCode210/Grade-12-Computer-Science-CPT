@@ -544,6 +544,11 @@ public class SoccerController implements ActionListener, KeyListener {
             } else if (model.intShotStage == 3) {
                 model.dblFinalPowerPercent = ((double)(model.intPowerLineX - 1020) / 240.0) * 100.0;
                 model.calculateTarget();
+                
+                //
+				// Math.random() is 0.0 to 1.0. (Math.random() * 101) gives 0 to 100. Subtract 50 gives -50 to 50.
+				model.intCircleBlurX = (int)(Math.random() * 101) - 50;
+				model.intCircleBlurY = (int)(Math.random() * 101) - 50;
                 model.intShotStage = 4;
                 sendShotData();
                 advanceToGoaliePhase();

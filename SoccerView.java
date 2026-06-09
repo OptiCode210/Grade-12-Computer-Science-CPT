@@ -429,48 +429,49 @@ public class SoccerView extends JPanel {
 	}
 
     public void drawGoalieGame(Graphics g) {
-		int goalLeft = 315;
-		int goalRight = 940;
-		int goalTop = 275;
-		int goalBottom = 500;
-        BufferedImage keeperImage = getSavingKeeperImage();
+		BufferedImage keeperImage = getSavingKeeperImage();
 
-        if (shootingBG != null) {
-			g.drawImage(shootingBG, 0, 0, 1280, 720, null);
+		if (shootingBG != null) g.drawImage(shootingBG, 0, 0, 1280, 720, null);
+		if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
+		if (keeperImage != null) g.drawImage(keeperImage, 450, 340, null);
+
+		drawProfessionalScoreboard(g);
+		drawGoalieMeters(g);
+		if (model.dblFinalPowerPercent > 0.0) {
+			
+			int goalLeft = 315;
+			int goalRight = 940;
+			int goalTop = 275;
+			int goalBottom = 500;
+
+			// 1. Calculate base accurate coordinates
+			int intBallTargetX = goalLeft + (int)((model.dblFinalLeftRightPercent / 100.0) * (goalRight - goalLeft));
+			int intBallTargetY = goalTop + (int)((model.dblFinalUpDownPercent / 100.0) * (goalBottom - goalTop));
+
+			// 2. Apply the single-generated random blur offset from the model
+			intBallTargetX += model.intCircleBlurX;
+			intBallTargetY += model.intCircleBlurY;
+
+			// 3. Set the circle radius size based on opponent shot power
+			int intMinRadius = 15; 
+			int intCircleRadius = intMinRadius + (int)(model.dblFinalPowerPercent * 0.8);
+			
+			// 4. Center coordinates around the blurred position
+			int intCircleX = intBallTargetX - intCircleRadius;
+			int intCircleY = intBallTargetY - intCircleRadius; 
+			
+			// 5. Draw the blurred target area
+			g.setColor(new Color(255, 0, 0, 85)); 
+			g.fillOval(intCircleX, intCircleY, intCircleRadius * 2, intCircleRadius * 2);
+			
+			g.setColor(new Color(255, 0, 0, 220));
+			g.drawOval(intCircleX, intCircleY, intCircleRadius * 2, intCircleRadius * 2);
 		}
-        if (goalImg != null) g.drawImage(goalImg, 130, 160, null);
-        if (keeperImage != null) g.drawImage(keeperImage, 450, 340, null);
 
-        drawProfessionalScoreboard(g);
-        drawGoalieMeters(g);
-
-        if (model.blnShowHitbox && model.intGoalieStage == 3) {
-            // Draw the coverage-based goalie hitbox after both goalie sliders lock.
-            // This is a debug view so we can see why a shot was saved or scored.
-            drawGoalieHitbox(g);
-        }
-        // 1. Calculate the center of the ball target using the opponent's shot percentages
-		// Maps 0-100% perfectly between your net boundaries
-		int intBallTargetX = goalLeft + (int)((model.dblFinalLeftRightPercent / 100.0) * (goalRight - goalLeft));
-		int intBallTargetY = goalTop + (int)((model.dblFinalUpDownPercent / 100.0) * (goalBottom - goalTop));
-
-		// 2. Determine the circle size based on the opponent's power percentage
-		int intMinRadius = 15; 
-		int intCircleRadius = intMinRadius + (int)(model.dblFinalPowerPercent * 0.8);
-		
-		// 3. Shift coordinates so the circle is perfectly centered around that target coordinate
-		int intCircleX = intBallTargetX - intCircleRadius;
-		int intCircleY = intBallTargetY - intCircleRadius; 
-		
-		// 4. Paint the target circle overlay (Semi-transparent red highlight)
-		g.setColor(new Color(255, 0, 0, 85)); 
-		g.fillOval(intCircleX, intCircleY, intCircleRadius * 2, intCircleRadius * 2);
-		
-		// 5. Clean, sharp outer border ring
-		g.setColor(new Color(255, 0, 0, 220));
-		g.drawOval(intCircleX, intCircleY, intCircleRadius * 2, intCircleRadius * 2);
-
+		if (model.blnShowHitbox && model.intGoalieStage == 3) {
+			drawGoalieHitbox(g);
     }
+}
 
     public void drawPlayAnimation(Graphics g) {
         BufferedImage strikerImage = getShootingStrikerImage();

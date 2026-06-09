@@ -88,6 +88,10 @@ public class SoccerModel {
 
     public double dblGoalieFinalLeftRightPercent = 0.0;
     public double dblGoalieFinalUpDownPercent = 0.0;
+    
+    //Indicator for goalie
+    public int intCircleBlurX;
+	public int intCircleBlurY;
 
     // Result variables for the save/goal check.
     // blnResultReady becomes true once the goalie finishes both sliders.
@@ -524,5 +528,7 @@ public class SoccerModel {
     // Constructor.
     public SoccerModel() {
         loadCSV();
+        this.intCircleBlurX = (int)(Math.random() * 101) - 50;
+		this.intCircleBlurY = (int)(Math.random() * 101) - 50;
     }
 }

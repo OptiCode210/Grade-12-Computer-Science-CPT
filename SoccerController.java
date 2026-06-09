@@ -103,8 +103,8 @@ public class SoccerController implements ActionListener, KeyListener {
 			}else if (model.intP2Score > model.intP1Score){
 				view.pickLabel.setText("PLAYER 2 WINS");
 			}
-			view.winLabel.setVisible(true); 			
-            model.blnWinningAnimationPrinted = true;
+            // Wait until the final shot animation finishes before showing the win screen.
+            model.blnPendingWinningAnimation = true;
         }
 
         model.startPlayAnimation();
@@ -120,11 +120,36 @@ public class SoccerController implements ActionListener, KeyListener {
 
         model.blnResultReady = false;
         model.blnResultScored = false;
+        // Hide the red shooting hint once the shot animation is finished.
+        model.blnShowShootingHint = false;
         model.resetShot();
         model.resetGoalie();
+
+        if (model.blnPendingWinningAnimation) {
+            // Now that the final shooting/saving animation is done, show the win screen.
+            model.blnPendingWinningAnimation = false;
+            model.blnWinningAnimationPrinted = true;
+            view.hideGameComponentsForWin();
+            startCloseWindowTimer();
+            view.thePanel.repaint();
+            return;
+        }
+
         view.lblLeftRight.setVisible(true);
         view.lblUpDown.setVisible(true);
         view.lblPower.setVisible(model.shouldLocalViewShowShooting());
+    }
+
+    private void startCloseWindowTimer() {
+        // Show the win screen for 3 seconds, then close the game window.
+        Timer closeTimer = new Timer(3000, new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                theTimer.stop();
+                view.theFrame.dispose();
+            }
+        });
+        closeTimer.setRepeats(false);
+        closeTimer.start();
     }
 
     private void sendShotData() {
@@ -156,6 +181,8 @@ public class SoccerController implements ActionListener, KeyListener {
         }
 
         model.resetGoalie();
+        // Hide the indicator until the striker's shot data is sent to the goalie.
+        model.blnShowShootingHint = false;
         view.lblPower.setVisible(false);
 
         if (model.connectSSM != null) {
@@ -367,6 +394,8 @@ public class SoccerController implements ActionListener, KeyListener {
                 model.dblFinalPowerPercent = Double.parseDouble(strSplit[3]);
                 model.calculateTarget();
                 model.intShotStage = 4;
+                // Show the red shooting hint as soon as the goalie receives the striker's shot.
+                model.blnShowShootingHint = true;
                 view.thePanel.repaint();
             } else if (strSplit[0].equals("ANIM")) {
                 // Both computers use this same animation packet so the striker,
@@ -550,7 +579,8 @@ public class SoccerController implements ActionListener, KeyListener {
                 model.dblFinalUpDownPercent = ((double)(model.intUpDownLineY - 230) / 240.0) * 100.0;
                 model.intShotStage = 3;
             } else if (model.intShotStage == 3) {
-                model.dblFinalPowerPercent = ((double)(model.intPowerLineX - 1020) / 240.0) * 100.0;
+                // Keep striker power at minimum 1.0 so it is never 0.0.
+                model.dblFinalPowerPercent = Math.max(1.0, ((double)(model.intPowerLineX - 1020) / 240.0) * 100.0);
                 model.calculateTarget();
                 
                 //
@@ -558,8 +588,9 @@ public class SoccerController implements ActionListener, KeyListener {
 				model.intCircleBlurX = (int)(Math.random() * 101) - 50;
 				model.intCircleBlurY = (int)(Math.random() * 101) - 50;
                 model.intShotStage = 4;
-                sendShotData();
                 advanceToGoaliePhase();
+                // Send shot data after the goalie phase so the indicator turns on last.
+                sendShotData();
             }
         }
     }

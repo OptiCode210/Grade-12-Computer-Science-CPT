@@ -484,9 +484,11 @@ public class SoccerView extends JPanel {
 			intBallTargetX += model.intCircleBlurX;
 			intBallTargetY += model.intCircleBlurY;
 
-			// 3. Set the circle radius size based on opponent shot power
-			int intMinRadius = 30; 
-			int intCircleRadius = intMinRadius + (int)(model.dblFinalPowerPercent * 0.8);
+			// 3. Higher shot power makes the indicator smaller and harder to save.
+            double dblClampedPower = Math.max(1.0, Math.min(100.0, model.dblFinalPowerPercent));
+			int intMinRadius = 30;
+            int intMaxRadius = 110;
+			int intCircleRadius = intMaxRadius - (int)((dblClampedPower / 100.0) * (intMaxRadius - intMinRadius));
 			
 			// 4. Center coordinates around the blurred position
 			int intCircleX = intBallTargetX - intCircleRadius;

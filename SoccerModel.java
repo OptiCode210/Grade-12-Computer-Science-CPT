@@ -69,9 +69,9 @@ public class SoccerModel {
     public int intPowerLineX = 1140;
 
     // Faster default striker slider speeds.
-    public int intLeftRightSpeed = 7;
-    public int intUpDownSpeed = 8;
-    public int intPowerSpeed = 9;
+    public int intLeftRightSpeed = 10;
+    public int intUpDownSpeed = 11;
+    public int intPowerSpeed = 12;
 
     public double dblFinalLeftRightPercent = 0.0;
     public double dblFinalUpDownPercent = 0.0;
@@ -85,8 +85,8 @@ public class SoccerModel {
     public int intGoalieUpDownLineY = 350;
 
     // Faster default goalie slider speeds.
-    public int intGoalieLeftRightSpeed = 7;
-    public int intGoalieUpDownSpeed = 8;
+    public int intGoalieLeftRightSpeed = 10;
+    public int intGoalieUpDownSpeed = 11;
 
     public double dblGoalieFinalLeftRightPercent = 0.0;
     public double dblGoalieFinalUpDownPercent = 0.0;
@@ -236,14 +236,15 @@ public class SoccerModel {
         intGoalieLeftRightLineX = 1140;
         intGoalieUpDownLineY = 350;
         // Reset goalie sliders with the faster default speeds.
-        intGoalieLeftRightSpeed = 7;
-        intGoalieUpDownSpeed = 8;
+        intGoalieLeftRightSpeed = 10;
+        intGoalieUpDownSpeed = 11;
         dblGoalieFinalLeftRightPercent = 0.0;
         dblGoalieFinalUpDownPercent = 0.0;
     }
 
     public void moveGoalieSliders() {
-        int intAgilitySpeed = Math.max(1, getCurrentSavingKeeperAgility() / 2);
+        // Use keeper agility, but make the goalie sliders faster overall.
+        int intAgilitySpeed = Math.max(1, getCurrentSavingKeeperAgility());
 
         if (intGoalieStage == 1) {
             if (intGoalieLeftRightSpeed > 0) {

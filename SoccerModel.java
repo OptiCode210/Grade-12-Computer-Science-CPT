@@ -56,7 +56,7 @@ public class SoccerModel {
     int intGamePhase = 0;   
     int intP1Score = 0;
     public int intP2Score = 0;
-    int intWinningScore = 5;
+    int intWinningScore = 3;
     public boolean blnWinningAnimationPrinted = false;
 
     //shooting mechanic variables
@@ -68,9 +68,10 @@ public class SoccerModel {
     public int intUpDownLineY = 350;
     public int intPowerLineX = 1140;
 
-    public int intLeftRightSpeed = 4;
-    public int intUpDownSpeed = 5;
-    public int intPowerSpeed = 6;
+    // Faster default striker slider speeds.
+    public int intLeftRightSpeed = 7;
+    public int intUpDownSpeed = 8;
+    public int intPowerSpeed = 9;
 
     public double dblFinalLeftRightPercent = 0.0;
     public double dblFinalUpDownPercent = 0.0;
@@ -83,8 +84,9 @@ public class SoccerModel {
     public int intGoalieLeftRightLineX = 1140;
     public int intGoalieUpDownLineY = 350;
 
-    public int intGoalieLeftRightSpeed = 4;
-    public int intGoalieUpDownSpeed = 5;
+    // Faster default goalie slider speeds.
+    public int intGoalieLeftRightSpeed = 7;
+    public int intGoalieUpDownSpeed = 8;
 
     public double dblGoalieFinalLeftRightPercent = 0.0;
     public double dblGoalieFinalUpDownPercent = 0.0;
@@ -99,6 +101,8 @@ public class SoccerModel {
     public boolean blnResultReady = false;
     public boolean blnResultScored = false;
     public boolean blnShowHitbox = true;
+    // Controls if the red shooting hint circle should be shown to the goalie.
+    public boolean blnShowShootingHint = true;
 
     // MVC animation state:
     // The model stores the numbers for the play animation so animation.java is not needed.
@@ -231,8 +235,9 @@ public class SoccerModel {
         intGoalieStage = 1;
         intGoalieLeftRightLineX = 1140;
         intGoalieUpDownLineY = 350;
-        intGoalieLeftRightSpeed = 4;
-        intGoalieUpDownSpeed = 5;
+        // Reset goalie sliders with the faster default speeds.
+        intGoalieLeftRightSpeed = 7;
+        intGoalieUpDownSpeed = 8;
         dblGoalieFinalLeftRightPercent = 0.0;
         dblGoalieFinalUpDownPercent = 0.0;
     }

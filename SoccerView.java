@@ -93,6 +93,7 @@ public class SoccerView extends JPanel {
 	public JTextArea chatArea = new JTextArea();
 	public JScrollPane chatScroll = new JScrollPane(chatArea);
 	public JTextField chatField = new JTextField();
+    public JLabel chatExitLabel = new JLabel("press TAB to exit chat");
 
     //Takes the properties from the Soccer model class
     private SoccerModel model;  
@@ -336,6 +337,7 @@ public class SoccerView extends JPanel {
         }
         chatScroll.setVisible(b);
 		chatField.setVisible(b);
+        chatExitLabel.setVisible(b);
     }
 
     public void setMainVisible(boolean b) { 
@@ -380,6 +382,12 @@ public class SoccerView extends JPanel {
                     return;
                 }
 
+                // After someone reaches the winning score, replace gameplay with the win screen.
+                if (SoccerView.this.model.blnWinningAnimationPrinted) {
+                    winningAnimation(g);
+                    return;
+                }
+
                 if (SoccerView.this.model.shouldLocalViewShowShooting()) {
                     // The local striker sees the shooting screen.
                     // After shooting, this screen can remain as a waiting/result view.
@@ -417,6 +425,15 @@ public class SoccerView extends JPanel {
 				chatField.setLocation(20, 510);
 				chatField.setVisible(false); // Initially hidden on menus
 				thePanel.add(chatField);
+
+                // Position chat exit reminder under the chat text field
+                chatExitLabel.setSize(220, 25);
+                chatExitLabel.setLocation(20, 555);
+                chatExitLabel.setForeground(Color.WHITE);
+                chatExitLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+                chatExitLabel.setHorizontalAlignment(SwingConstants.CENTER);
+                chatExitLabel.setVisible(false); // Initially hidden on menus
+                thePanel.add(chatExitLabel);
             }
         };
     }
@@ -452,7 +469,7 @@ public class SoccerView extends JPanel {
 
 		drawProfessionalScoreboard(g);
 		drawGoalieMeters(g);
-		if (model.dblFinalPowerPercent > 0.0) {
+		if (model.blnShowShootingHint && model.dblFinalPowerPercent > 0.0) {
 			
 			int goalLeft = 315;
 			int goalRight = 940;
@@ -771,7 +788,27 @@ public class SoccerView extends JPanel {
     }
 
     public void winningAnimation(Graphics g){
+        Graphics2D g2 = (Graphics2D) g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
+        // Draw a simple full-screen background for the winning screen.
+        g2.setColor(new Color(20, 20, 25));
+        g2.fillRect(0, 0, 1280, 720);
+
+        // Draw the big WIN text in the middle of the screen.
+        g2.setColor(new Color(180, 255, 50));
+        g2.setFont(new Font("Arial Black", Font.BOLD, 120));
+        g2.drawString("WIN", 500, 330);
+
+        // Show which player reached first to three.
+        g2.setColor(Color.WHITE);
+        g2.setFont(new Font("Arial", Font.BOLD, 48));
+
+        if (model.intP1Score > model.intP2Score) {
+            g2.drawString("PLAYER 1", 520, 410);
+        } else {
+            g2.drawString("PLAYER 2", 520, 410);
+        }
     }
 
     // Constructor

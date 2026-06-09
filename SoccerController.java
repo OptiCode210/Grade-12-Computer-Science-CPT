@@ -74,6 +74,8 @@ public class SoccerController implements ActionListener, KeyListener {
     private void startPlayAnimation(boolean blnShotSaved) {
         model.blnShotSaved = blnShotSaved;
         model.blnResultReady = true;
+        // Show the red shooting hint while the shot result is being animated.
+        model.blnShowShootingHint = true;
         boolean blnGoalScoredThisTurn = false;
         
         System.out.println("Shot: "+intShots);
@@ -120,6 +122,8 @@ public class SoccerController implements ActionListener, KeyListener {
 
         model.blnResultReady = false;
         model.blnResultScored = false;
+        // Hide the red shooting hint once the shot animation is finished.
+        model.blnShowShootingHint = false;
         model.resetShot();
         model.resetGoalie();
         view.lblLeftRight.setVisible(true);
@@ -550,7 +554,8 @@ public class SoccerController implements ActionListener, KeyListener {
                 model.dblFinalUpDownPercent = ((double)(model.intUpDownLineY - 230) / 240.0) * 100.0;
                 model.intShotStage = 3;
             } else if (model.intShotStage == 3) {
-                model.dblFinalPowerPercent = ((double)(model.intPowerLineX - 1020) / 240.0) * 100.0;
+                // Keep striker power at minimum 1.0 so it is never 0.0.
+                model.dblFinalPowerPercent = Math.max(1.0, ((double)(model.intPowerLineX - 1020) / 240.0) * 100.0);
                 model.calculateTarget();
                 
                 //

@@ -389,14 +389,14 @@ public class SoccerView extends JPanel {
                     g.drawImage(menuBG, 0, 0, 1280, 720, null);
                 }
 
-                if (SoccerView.this.model.isPlayAnimationRunning()) {
-                    drawPlayAnimation(g);
-                    return;
-                }
-
                 // After someone reaches the winning score, replace gameplay with the win screen.
                 if (SoccerView.this.model.blnWinningAnimationPrinted) {
                     winningAnimation(g);
+                    return;
+                }
+
+                if (SoccerView.this.model.isPlayAnimationRunning()) {
+                    drawPlayAnimation(g);
                     return;
                 }
 

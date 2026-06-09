@@ -74,6 +74,7 @@ public class SoccerView extends JPanel {
     public JLabel lblLeftRight = new JLabel("Left / Right");
     public JLabel lblUpDown = new JLabel("Up / Down");
     public JLabel lblPower = new JLabel("Power");
+    public JLabel winLabel = new JLabel("");
     public JComponent[] gameMenu;
 
     //Images
@@ -94,9 +95,7 @@ public class SoccerView extends JPanel {
 	public JTextField chatField = new JTextField();
 
     //Takes the properties from the Soccer model class
-    private SoccerModel model;
-
-    
+    private SoccerModel model;  
 
     //methods
     private void loadArtAssets() {
@@ -265,7 +264,7 @@ public class SoccerView extends JPanel {
         pickLabel.setForeground(Color.WHITE);
         pickLabel.setFont(new Font("Arial", Font.BOLD, 28));
         thePanel.add(pickLabel);
-
+        
         pickedKP1Label.setSize(500, 30); pickedKP1Label.setLocation(20, 610); thePanel.add(pickedKP1Label);
         pickedKP1Label.setForeground(Color.WHITE); pickedKP1Label.setFont(new Font("Arial", Font.BOLD, 20));
 
@@ -315,8 +314,13 @@ public class SoccerView extends JPanel {
         lblPower.setForeground(Color.WHITE);
         lblPower.setFont(new Font("Arial Black", Font.PLAIN, 18));
         thePanel.add(lblPower);
+        
+        winLabel.setFont(new Font("Arial", Font.BOLD, 48));
+		winLabel.setForeground(new Color(180, 255,50)); 
+		winLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		winLabel.setVerticalAlignment(SwingConstants.CENTER);
 
-        gameMenu = new JComponent[]{turnLabel, scoreLabel, lblLeftRight, lblUpDown, lblPower};
+        gameMenu = new JComponent[]{turnLabel, scoreLabel, lblLeftRight, lblUpDown, lblPower, winLabel};
         setGameVisible(false);
 
         //Set all the booleans to true 

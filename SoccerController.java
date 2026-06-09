@@ -98,20 +98,18 @@ public class SoccerController implements ActionListener, KeyListener {
         }
 
         if (blnGoalScoredThisTurn && !model.blnWinningAnimationPrinted && (model.intP1Score >= model.intWinningScore || model.intP2Score >= model.intWinningScore)) {
-			if (model.intP1Score > model.intP2Score) {
+			if(model.intP1Score > model.intP2Score){
 				view.pickLabel.setText("PLAYER 1 WINS");
-			} else if (model.intP2Score > model.intP1Score) {
+			}else if (model.intP2Score > model.intP1Score){
 				view.pickLabel.setText("PLAYER 2 WINS");
-			} else {
-				view.pickLabel.setText("DRAW");
 			}
-			view.pickLabel.setVisible(true); 
-			model.blnWinningAnimationPrinted = true;
-		}
+			view.winLabel.setVisible(true); 			
+            model.blnWinningAnimationPrinted = true;
+        }
 
-		model.startPlayAnimation();
-		view.thePanel.repaint();
-	}
+        model.startPlayAnimation();
+        view.thePanel.repaint();
+    }
 
     private void finishPlayAnimation() {
         if (model.intGamePhase == 2) {

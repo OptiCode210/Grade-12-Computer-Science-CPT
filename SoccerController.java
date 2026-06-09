@@ -16,6 +16,7 @@ public class SoccerController implements ActionListener, KeyListener {
     int fps = 60;
     private Timer theTimer = new Timer(1000 / fps, this);
 
+	int intShots = 1;
 
     //methods
     private void attachListeners() {
@@ -69,11 +70,13 @@ public class SoccerController implements ActionListener, KeyListener {
             view.pickLabel.setText("Waiting for other player...");
         }
     }
-
+  
     private void startPlayAnimation(boolean blnShotSaved) {
         model.blnShotSaved = blnShotSaved;
         model.blnResultReady = true;
         boolean blnGoalScoredThisTurn = false;
+        
+        System.out.println("Shot: "+intShots);
 
         if (!model.blnShotSaved && !model.blnResultScored) {
             if (model.intGamePhase == 2) {
@@ -88,20 +91,27 @@ public class SoccerController implements ActionListener, KeyListener {
 
         if (model.blnShotSaved) {
             System.out.println("Shot saved");
+            intShots++;
         } else {
             System.out.println("Goal scored");
+            intShots++;
         }
 
-        if (blnGoalScoredThisTurn &&
-            !model.blnWinningAnimationPrinted &&
-            (model.intP1Score >= model.intWinningScore || model.intP2Score >= model.intWinningScore)) {
-            System.out.println("winning animation here");
-            model.blnWinningAnimationPrinted = true;
-        }
+        if (blnGoalScoredThisTurn && !model.blnWinningAnimationPrinted && (model.intP1Score >= model.intWinningScore || model.intP2Score >= model.intWinningScore)) {
+			if (model.intP1Score > model.intP2Score) {
+				view.pickLabel.setText("PLAYER 1 WINS");
+			} else if (model.intP2Score > model.intP1Score) {
+				view.pickLabel.setText("PLAYER 2 WINS");
+			} else {
+				view.pickLabel.setText("DRAW");
+			}
+			view.pickLabel.setVisible(true); 
+			model.blnWinningAnimationPrinted = true;
+		}
 
-        model.startPlayAnimation();
-        view.thePanel.repaint();
-    }
+		model.startPlayAnimation();
+		view.thePanel.repaint();
+	}
 
     private void finishPlayAnimation() {
         if (model.intGamePhase == 2) {

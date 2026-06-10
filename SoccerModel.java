@@ -199,6 +199,8 @@ public class SoccerModel {
         intLeftRightLineX = 1140;
         intUpDownLineY = 350;
         intPowerLineX = 1140;
+        int intCurrentPower = getCurrentShootingStrikerPower();
+        intPowerSpeed = Math.max(4, 14 - intCurrentPower);
         blnShooting = false;
     }
 
@@ -231,6 +233,15 @@ public class SoccerModel {
             return intP1KAgi;
         }
         return keeperAgility;
+    }
+
+    public int getCurrentShootingStrikerPower() {
+        if (intGamePhase == 1) {
+            return intP1SPwr;
+        } else if (intGamePhase == 3) {
+            return intP2SPwr;
+        }
+        return strikerPower;
     }
 
     public void resetGoalie() {

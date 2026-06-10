@@ -513,6 +513,12 @@ public class SoccerController implements ActionListener, KeyListener {
 			}
 		}
 		if (evt.getSource() == theTimer) {
+            if (model.blnWinningAnimationPrinted) {
+                view.hideGameComponentsForWin();
+                view.thePanel.repaint();
+                return;
+            }
+
             if (model.intGamePhase > 0) {
                 if (model.isPlayAnimationRunning()) {
                     view.lblLeftRight.setVisible(false);

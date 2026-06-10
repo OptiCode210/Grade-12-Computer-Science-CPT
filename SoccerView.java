@@ -1,6 +1,5 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -99,47 +98,51 @@ public class SoccerView extends JPanel {
     private SoccerModel model;  
 
     //methods
+    private BufferedImage loadImage(String strPath) throws IOException {
+        return ImageIO.read(getClass().getResource(strPath));
+    }
+
     private void loadArtAssets() {
         //load images
         try {
-            S1Front = ImageIO.read(new File("Images/Strikers/S1Front.gif"));
-            S1Run   = ImageIO.read(new File("Images/Strikers/S1Run.gif"));
-            S1Shoot = ImageIO.read(new File("Images/Strikers/S1Shoot.gif"));
-            S1Stand = ImageIO.read(new File("Images/Strikers/S1Stand.gif"));
-            S1Card  = ImageIO.read(new File("Images/player cards/S1Card.png"));
+            S1Front = loadImage("/Images/Strikers/S1Front.gif");
+            S1Run   = loadImage("/Images/Strikers/S1Run.gif");
+            S1Shoot = loadImage("/Images/Strikers/S1Shoot.gif");
+            S1Stand = loadImage("/Images/Strikers/S1Stand.gif");
+            S1Card  = loadImage("/Images/player cards/S1Card.png");
 
-            S2Front = ImageIO.read(new File("Images/Strikers/S2Front.gif"));
-            S2Run   = ImageIO.read(new File("Images/Strikers/S2Run.gif"));
-            S2Shoot = ImageIO.read(new File("Images/Strikers/S2Shoot.gif"));
-            S2Stand = ImageIO.read(new File("Images/Strikers/S2Stand.gif"));
-            S2Card  = ImageIO.read(new File("Images/player cards/S2Card.png"));
+            S2Front = loadImage("/Images/Strikers/S2Front.gif");
+            S2Run   = loadImage("/Images/Strikers/S2Run.gif");
+            S2Shoot = loadImage("/Images/Strikers/S2Shoot.gif");
+            S2Stand = loadImage("/Images/Strikers/S2Stand.gif");
+            S2Card  = loadImage("/Images/player cards/S2Card.png");
 
-            S3Front = ImageIO.read(new File("Images/Strikers/S3Front.gif"));
-            S3Run   = ImageIO.read(new File("Images/Strikers/S3Run.gif"));
-            S3Shoot = ImageIO.read(new File("Images/Strikers/S3Shoot.gif"));
-            S3Stand = ImageIO.read(new File("Images/Strikers/S3Stand.gif"));
-            S3Card  = ImageIO.read(new File("Images/player cards/S3Card.png"));
+            S3Front = loadImage("/Images/Strikers/S3Front.gif");
+            S3Run   = loadImage("/Images/Strikers/S3Run.gif");
+            S3Shoot = loadImage("/Images/Strikers/S3Shoot.gif");
+            S3Stand = loadImage("/Images/Strikers/S3Stand.gif");
+            S3Card  = loadImage("/Images/player cards/S3Card.png");
 
-            K1Left  = ImageIO.read(new File("Images/keepers/K1Left.png"));
-            K1Right = ImageIO.read(new File("Images/keepers/K1Right.png"));
-            K1Stand = ImageIO.read(new File("Images/keepers/K1Stand.png"));
-            K1Card  = ImageIO.read(new File("Images/player cards/K1Card.png"));
+            K1Left  = loadImage("/Images/keepers/K1Left.png");
+            K1Right = loadImage("/Images/keepers/K1Right.png");
+            K1Stand = loadImage("/Images/keepers/K1Stand.png");
+            K1Card  = loadImage("/Images/player cards/K1Card.png");
 
-            K2Left  = ImageIO.read(new File("Images/keepers/K2Left.png"));
-            K2Right = ImageIO.read(new File("Images/keepers/K2Right.png"));
-            K2Stand = ImageIO.read(new File("Images/keepers/K2Stand.png"));
-            K2Card  = ImageIO.read(new File("Images/player cards/K2Card.png"));
+            K2Left  = loadImage("/Images/keepers/K2Left.png");
+            K2Right = loadImage("/Images/keepers/K2Right.png");
+            K2Stand = loadImage("/Images/keepers/K2Stand.png");
+            K2Card  = loadImage("/Images/player cards/K2Card.png");
 
-            K3Left  = ImageIO.read(new File("Images/keepers/K3Left.png"));
-            K3Right = ImageIO.read(new File("Images/keepers/K3Right.png"));
-            K3Stand = ImageIO.read(new File("Images/keepers/K3Stand.png"));
-            K3Card  = ImageIO.read(new File("Images/player cards/K3Card.png"));
+            K3Left  = loadImage("/Images/keepers/K3Left.png");
+            K3Right = loadImage("/Images/keepers/K3Right.png");
+            K3Stand = loadImage("/Images/keepers/K3Stand.png");
+            K3Card  = loadImage("/Images/player cards/K3Card.png");
 
-            shootingBG = ImageIO.read(new File("Images/shootingBG.jpeg"));
-            goalImg = ImageIO.read(new File("Images/Goal.png"));
-            ballImg = ImageIO.read(new File("Images/ball.png"));
+            shootingBG = loadImage("/Images/shootingBG.jpeg");
+            goalImg = loadImage("/Images/Goal.png");
+            ballImg = loadImage("/Images/ball.png");
 
-            menuBG  = ImageIO.read(new File("Images/menuBG.jpg"));
+            menuBG  = loadImage("/Images/menuBG.jpg");
         } catch (IOException e) {
             System.out.println("Image unable to be loaded: " + e);
         }

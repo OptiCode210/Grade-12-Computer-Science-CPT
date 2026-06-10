@@ -1,6 +1,6 @@
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  * <h1>SoccerModel</h1>
@@ -248,7 +248,7 @@ public class SoccerModel {
     public void loadCSV() {
         try {
             //opens strikers csv file
-            BufferedReader playersFile = new BufferedReader(new FileReader("players.csv"));
+            BufferedReader playersFile = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/players.csv")));
             String strLine;
             int count = 0;
 
@@ -264,7 +264,7 @@ public class SoccerModel {
             playersFile.close();
 
             //open keeper csv file
-            BufferedReader keepersFile = new BufferedReader(new FileReader("keepers.csv"));
+            BufferedReader keepersFile = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream("/keepers.csv")));
             count = 0;
 
             while ((strLine = keepersFile.readLine()) != null && count < keepers.length) {

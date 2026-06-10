@@ -181,7 +181,7 @@ public class SoccerController implements ActionListener, KeyListener {
         }
 
         model.resetGoalie();
-        // Hide the indicator until the striker's shot data is sent to the goalie.
+        // Hide the indicator until the striker's shot data is sent to the goalie. 
         model.blnShowShootingHint = false;
         view.lblPower.setVisible(false);
 

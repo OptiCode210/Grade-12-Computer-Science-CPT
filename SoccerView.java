@@ -582,7 +582,7 @@ public class SoccerView extends JPanel {
         String strKeeperName;
         boolean blnDiveRight = model.dblGoalieFinalLeftRightPercent >= 50.0;
 
-        if (model.intGamePhase == 2) {
+        if (model.intGamePhase == 1 || model.intGamePhase == 2) {
             strKeeperName = model.strP2K;
         } else {
             strKeeperName = model.strP1K;

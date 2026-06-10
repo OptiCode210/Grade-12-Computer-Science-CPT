@@ -612,10 +612,10 @@ public class SoccerView extends JPanel {
     private BufferedImage getSavingKeeperImage() {
         String strKeeperName;
 
-        if (model.intGamePhase == 1 || model.intGamePhase == 2) {
-            strKeeperName = model.strP2K;
-        } else {
+        if (model.intPicking == 1) {
             strKeeperName = model.strP1K;
+        } else {
+            strKeeperName = model.strP2K;
         }
 
         if (strKeeperName != null && strKeeperName.equals(model.keepers[1][0])) {

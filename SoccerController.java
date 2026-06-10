@@ -79,13 +79,7 @@ public class SoccerController implements ActionListener, KeyListener {
         System.out.println("Shot: "+intShots);
 
         if (!model.blnShotSaved && !model.blnResultScored) {
-            if (model.intGamePhase == 2) {
-                model.intP1Score++;
-            } else if (model.intGamePhase == 4) {
-                model.intP2Score++;
-            }
-
-            model.blnResultScored = true;
+            model.blnScoreAfterAnimation = true;
             blnGoalScoredThisTurn = true;
         }
 
@@ -97,10 +91,21 @@ public class SoccerController implements ActionListener, KeyListener {
             intShots++;
         }
 
-        if (blnGoalScoredThisTurn && !model.blnWinningAnimationPrinted && (model.intP1Score >= model.intWinningScore || model.intP2Score >= model.intWinningScore)) {
-			if(model.intP1Score > model.intP2Score){
+        int intP1ScoreAfterAnimation = model.intP1Score;
+        int intP2ScoreAfterAnimation = model.intP2Score;
+
+        if (model.blnScoreAfterAnimation) {
+            if (model.intGamePhase == 2) {
+                intP1ScoreAfterAnimation++;
+            } else if (model.intGamePhase == 4) {
+                intP2ScoreAfterAnimation++;
+            }
+        }
+
+        if (blnGoalScoredThisTurn && !model.blnWinningAnimationPrinted && (intP1ScoreAfterAnimation >= model.intWinningScore || intP2ScoreAfterAnimation >= model.intWinningScore)) {
+			if(intP1ScoreAfterAnimation > intP2ScoreAfterAnimation){
 				model.intWinningPlayer = 1;
-			}else if (model.intP2Score > model.intP1Score){
+			}else if (intP2ScoreAfterAnimation > intP1ScoreAfterAnimation){
 				model.intWinningPlayer = 2;
 			}
             // Wait until the final shot animation finishes before showing the win screen.
@@ -112,6 +117,17 @@ public class SoccerController implements ActionListener, KeyListener {
     }
 
     private void finishPlayAnimation() {
+        if (model.blnScoreAfterAnimation) {
+            if (model.intGamePhase == 2) {
+                model.intP1Score++;
+            } else if (model.intGamePhase == 4) {
+                model.intP2Score++;
+            }
+
+            model.blnScoreAfterAnimation = false;
+            model.blnResultScored = true;
+        }
+
         if (model.intGamePhase == 2) {
             model.intGamePhase = 3;
         } else if (model.intGamePhase == 4) {

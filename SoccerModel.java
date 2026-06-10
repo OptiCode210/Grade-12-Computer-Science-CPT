@@ -102,6 +102,8 @@ public class SoccerModel {
     public boolean blnPendingWinningAnimation = false;
     /**Tracks when the final game-over win text is printed*/
     public boolean blnWinningAnimationPrinted = false;
+    /**Tracks when a goal should be added after the shot animation finishes*/
+    public boolean blnScoreAfterAnimation = false;
 
     //shooting mechanic variables
     /**Tracks which slider the striker is on*/

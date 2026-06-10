@@ -99,9 +99,9 @@ public class SoccerController implements ActionListener, KeyListener {
 
         if (blnGoalScoredThisTurn && !model.blnWinningAnimationPrinted && (model.intP1Score >= model.intWinningScore || model.intP2Score >= model.intWinningScore)) {
 			if(model.intP1Score > model.intP2Score){
-				view.pickLabel.setText("PLAYER 1 WINS");
+				model.intWinningPlayer = 1;
 			}else if (model.intP2Score > model.intP1Score){
-				view.pickLabel.setText("PLAYER 2 WINS");
+				model.intWinningPlayer = 2;
 			}
             // Wait until the final shot animation finishes before showing the win screen.
             model.blnPendingWinningAnimation = true;
@@ -167,7 +167,8 @@ public class SoccerController implements ActionListener, KeyListener {
                 model.dblFinalUpDownPercent + "," +
                 model.dblFinalPowerPercent + "," +
                 model.dblGoalieFinalLeftRightPercent + "," +
-                model.dblGoalieFinalUpDownPercent;
+                model.dblGoalieFinalUpDownPercent + "," +
+                model.intWinningPlayer;
 
             model.connectSSM.sendText(strAnimMessage);
         }
@@ -330,6 +331,12 @@ public class SoccerController implements ActionListener, KeyListener {
             } else if (strSplit[0].equals("Start")) {
                 model.blnConnected = true;
                 System.out.println("Server started game");
+
+                view.setMainVisible(false);
+                view.setConnectVisible(false);
+                view.setSelectionVisible(true);
+                view.thePanel.revalidate();
+                view.thePanel.repaint();
             } else if (strSplit[0].equals("LIVE")) {
                 String strType = strSplit[1];
                 String strName = strSplit[2];
@@ -410,6 +417,10 @@ public class SoccerController implements ActionListener, KeyListener {
                 // Goalie slider values from the saver.
                 model.dblGoalieFinalLeftRightPercent = Double.parseDouble(strSplit[5]);
                 model.dblGoalieFinalUpDownPercent = Double.parseDouble(strSplit[6]);
+
+                if (strSplit.length > 7) {
+                    model.intWinningPlayer = Integer.parseInt(strSplit[7]);
+                }
 
                 // Rebuild the exact same ball target before starting the animation.
                 model.calculateTarget();

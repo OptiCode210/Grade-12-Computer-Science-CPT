@@ -96,6 +96,8 @@ public class SoccerModel {
     int intP1Score = 0;
     public int intP2Score = 0;
     int intWinningScore = 3;
+    /**Stores which player won the game. 0 means no winner yet, 1 means P1, 2 means P2.*/
+    public int intWinningPlayer = 0;
     // True when the final goal happens, but the final shot animation still needs to play.
     public boolean blnPendingWinningAnimation = false;
     /**Tracks when the final game-over win text is printed*/

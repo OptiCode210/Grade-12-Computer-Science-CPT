@@ -818,9 +818,9 @@ public class SoccerView extends JPanel {
         g2.setColor(Color.WHITE);
         g2.setFont(new Font("Arial", Font.BOLD, 48));
 
-        if (model.intP1Score > model.intP2Score) {
+        if (model.intWinningPlayer == 1) {
             g2.drawString("PLAYER 1", 520, 410);
-        } else {
+        } else if (model.intWinningPlayer == 2) {
             g2.drawString("PLAYER 2", 520, 410);
         }
     }

@@ -543,7 +543,7 @@ public class SoccerController implements ActionListener, KeyListener {
 		// Completely hide both old label text layers
 		view.scoreLabel.setVisible(false); 
 		view.turnLabel.setVisible(false); 
-        view.lblPower.setVisible(true);
+        view.lblPower.setVisible(model.shouldLocalViewShowShooting());
 		
 		theTimer.start();
 		view.thePanel.revalidate();

@@ -341,6 +341,11 @@ public class SoccerView extends JPanel {
     }
 
     public void hideGameComponentsForWin() {
+        setMainVisible(false);
+        setConnectVisible(false);
+        setSelectionVisible(false);
+        setHelpVisible(false);
+
         // Hide every gameplay label so the painted win screen is clean.
         for (JComponent c : gameMenu) {
             c.setVisible(false);
@@ -350,6 +355,7 @@ public class SoccerView extends JPanel {
         chatScroll.setVisible(false);
         chatField.setVisible(false);
         chatExitLabel.setVisible(false);
+        pickLabel.setVisible(false);
     }
 
     public void setMainVisible(boolean b) { 

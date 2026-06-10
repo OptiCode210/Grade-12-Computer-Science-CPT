@@ -420,6 +420,10 @@ public class SoccerController implements ActionListener, KeyListener {
 
                 if (strSplit.length > 7) {
                     model.intWinningPlayer = Integer.parseInt(strSplit[7]);
+
+                    if (model.intWinningPlayer > 0) {
+                        model.blnPendingWinningAnimation = true;
+                    }
                 }
 
                 // Rebuild the exact same ball target before starting the animation.
